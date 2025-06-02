@@ -1,19 +1,11 @@
-
-const cache = new Map();
-
 async function fetchContestants(groupName) {
-  const cacheKey = groupName || "all";
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey);
-  }
-
   const url = groupName
     ? `/api/contestants?groupName=${encodeURIComponent(groupName)}`
     : "/api/contestants";
 
   try {
     const res = await fetch(url, {
-      cache: "no-store",
+      next: { revalidate: 60 }, // Cache for 60 seconds
     });
 
     if (!res.ok) {
@@ -21,7 +13,6 @@ async function fetchContestants(groupName) {
     }
 
     const { data } = await res.json();
-    cache.set(cacheKey, data);
     return data;
   } catch (error) {
     throw new Error(`Fetch error: ${error.message}`);

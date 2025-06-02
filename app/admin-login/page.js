@@ -50,8 +50,8 @@ export default function Login() {
       } else {
         setSuccess(true);
         setTimeout(() => {
-          console.log("Redirecting to /team-panel");
-          router.push("/team-panel");
+          console.log("Redirecting to /admin");
+          router.push("/admin");
         }, 1000);
       }
     } catch (err) {
@@ -83,7 +83,7 @@ export default function Login() {
               </div>
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">Welcome Back</h1>
-            <p className="text-blue-100 text-sm">Sign in to your team account</p>
+            <p className="text-blue-100 text-sm">Sign in to your admin account</p>
           </div>
 
           {/* Form Section */}
@@ -144,7 +144,7 @@ export default function Login() {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-gray-50 focus:bg-white"
+                    className="w-full text-black pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-gray-50 focus:bg-white"
                     placeholder="Enter your password"
                     required
                     disabled={isLoading}
