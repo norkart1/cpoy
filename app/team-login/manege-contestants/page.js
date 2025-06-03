@@ -12,8 +12,10 @@ export default function ContestantsPage() {
 
   useEffect(() => {
     async function fetchContestants() {
+      
       try {
-const response = await fetch(`/api/manege-contestants?groupName=${encodeURIComponent(groupName)}`);        const result = await response.json();
+const response = await fetch(`/api/manege-contestants?groupName=${encodeURIComponent(groupName)}`);   
+     const result = await response.json();
         
         if (result.success) {
           setContestants(result.data);
