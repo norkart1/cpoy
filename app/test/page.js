@@ -5,7 +5,7 @@ async function fetchContestants(groupName) {
 
   try {
     const res = await fetch(url, {
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      next: { revalidate: 60 },
     });
 
     if (!res.ok) {
@@ -19,7 +19,11 @@ async function fetchContestants(groupName) {
   }
 }
 
-export default async function ContestantList({ groupName }) {
+export const dynamic = "force-dynamic";
+
+export default async function ContestantsPage({ searchParams }) {
+  const groupName = searchParams.groupName || "";
+
   let contestants = [];
   let error = null;
 
@@ -31,9 +35,9 @@ export default async function ContestantList({ groupName }) {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4">
         Contestants {groupName ? `in ${groupName}` : "List"}
-      </h2>
+      </h1>
 
       {error ? (
         <p className="text-red-500">Error: {error}</p>

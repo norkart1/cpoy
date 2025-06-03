@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import ContestantList from "@/components/ContestantsList";
+import Link from "next/link";
 
 
 import { signOut } from "next-auth/react";
@@ -30,6 +31,7 @@ export default  function AddItem () {
   const [juries, setJuries] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
     const [teamName, setTeamName] = useState('');
+    const [contestants,setContestants]=useState([])
 
   const router = useRouter();
 
@@ -61,6 +63,7 @@ export default  function AddItem () {
 
     fetchCreatedItems();
     addForm();
+    // listContestants()
   }, []);
 
     const handleLogout = async () => {
@@ -70,6 +73,22 @@ export default  function AddItem () {
       console.error("Logout error:", error);
     }
   };
+
+//  const listContestants= async ()=>{
+
+//   try{
+//     let groupName="Fakhriyah";
+
+//     const res = await fetch(`/api/contestants?groupName=${encodeURIComponent(groupName)}`);
+//     const Contestants =await res.json()
+//     setContestants(Contestants)
+//     console.log(contestants);
+    
+//   }catch(err){
+//     console.error("feild to fetch contestants")
+//   }
+
+//  }
 
   const addForm = () => {
     setFormItems((prev) => [
@@ -126,6 +145,8 @@ export default  function AddItem () {
       setMessage({ type: "error", text: "Server error. Try again." });
     }
   };
+
+
 
   const handleShare = async (itemId) => {
     try {
@@ -190,15 +211,37 @@ export default  function AddItem () {
 
   return (
     <div className="min-h-screen text-black bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <header className="flex items-center justify-between p-4 bg-gray-100 shadow-md">
-      <h1 className="text-2xl font-bold text-black ">{teamName}</h1>
-      <button
-        onClick={handleLogout}
-        className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
+     <nav className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-200">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-between h-16">
+      {/* Left Section: Team Name */}
+      <div className="flex items-center">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          {teamName || "Team Panel"}
+        </h1>
+      </div>
+
+      {/* Right Section: Logout Button */}
+      <div className="flex items-center space-x-4">
+      <div>
+      <Link
+        href="team-login/manege-contestants" // Adjust this path to match your contestant list page route
+        className="text-blue-600 hover:underline"
       >
-        Logout
-      </button>
-    </header>
+        manage contestant
+      </Link>
+    </div>
+
+        <a
+          onClick={handleLogout}
+          className="px-6 py-2  text-gray-500 font-semibold rounded-lg  focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105"
+        >
+          Logout
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
       {/* Header Section */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -239,6 +282,37 @@ export default  function AddItem () {
           </div>
         )}
         {/* Form Section */}
+
+        <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">
+        {/* Contestants {groupName ? `in ${groupName}` : "List"} */}
+      </h1>
+
+     
+        {/* <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left">Contestant Number</th>
+                <th className="border border-gray-300 p-2 text-left">Name</th>
+                <th className="border border-gray-300 p-2 text-left">Group Name</th>
+                <th className="border border-gray-300 p-2 text-left">Scratch Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contestants.map((contestant) => (
+                <tr key={contestant._id} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 p-2">{contestant.contestantNumber || "N/A"}</td>
+                  <td className="border border-gray-300 p-2">{contestant.name}</td>
+                  <td className="border border-gray-300 p-2">{contestant.groupName}</td>
+                  <td className="border border-gray-300 p-2">{contestant.scratchCode || "None"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div> */}
+    
+    </div>
         {/* {formItems.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New Competition</h2>

@@ -1,19 +1,11 @@
-
-const cache = new Map();
-
 async function fetchContestants(groupName) {
-  const cacheKey = groupName || "all";
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey);
-  }
-
   const url = groupName
-    ? `/api/contestants?groupName=${encodeURIComponent(groupName)}`
+    ? `/api/contestants?groupName=${encodeURIComponent("Fakhriyah")}`
     : "/api/contestants";
 
   try {
     const res = await fetch(url, {
-      cache: "no-store",
+      next: { revalidate: 60 }, // Cache for 60 seconds
     });
 
     if (!res.ok) {
@@ -21,14 +13,15 @@ async function fetchContestants(groupName) {
     }
 
     const { data } = await res.json();
-    cache.set(cacheKey, data);
     return data;
   } catch (error) {
     throw new Error(`Fetch error: ${error.message}`);
   }
 }
 
-export default async function ContestantList({ groupName }) {
+export default async function ContestantsPage({ searchParams }) {
+  const groupName = searchParams.groupName || ""; // Extract groupName from query parameters
+
   let contestants = [];
   let error = null;
 
@@ -40,9 +33,9 @@ export default async function ContestantList({ groupName }) {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4">
         Contestants {groupName ? `in ${groupName}` : "List"}
-      </h2>
+      </h1>
 
       {error ? (
         <p className="text-red-500">Error: {error}</p>
