@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Plus, Trash2, Share2, Edit3, Users, Award, Calendar, Tag } from "lucide-react";
+import { Plus, Trash2, Share2, Edit3, Users, Award, Calendar, Tag, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -31,6 +31,8 @@ export default function AddItem() {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [teamName, setTeamName] = useState('');
   const [contestants, setContestants] = useState([])
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchCategory, setSearchCategory] = useState("all");
 
   const router = useRouter();
 
@@ -159,6 +161,17 @@ export default function AddItem() {
     }
   };
 
+  const filteredItems = createdItems.filter((item) => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.stage.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory = searchCategory === "all" || item.category === searchCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <UserSidebar />
@@ -189,32 +202,58 @@ export default function AddItem() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">Active Competitions</h2>
-                <p className="text-gray-600 mt-1">{createdItems.length} competitions created</p>
+                <p className="text-gray-600 mt-1">{filteredItems.length} competitions found</p>
+              </div>
+
+              {/* Search and Filter Section */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black" />
+                  <input
+                    type="text"
+                    placeholder="Search competitions..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200 bg-white/60 w-full sm:w-64"
+                  />
+                </div>
+                <select
+                  value={searchCategory}
+                  onChange={(e) => setSearchCategory(e.target.value)}
+                  className="py-2 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200 bg-white/60 text-gray-400 px-2 "
+                >
+                  <option value="all" className="text-gray-600">All Categories</option>
+                  <option value="senior" className="text-gray-600">Senior</option>
+                  <option value="junior" className="text-gray-600">Junior</option>
+                  <option value="subjunior" className="text-gray-600">Sub Junior</option>
+                  <option value="general(individual)" className="text-gray-600">General (Individual)</option>
+                  <option value="general(group)" className="text-gray-600">General (Group)</option>
+                </select>
               </div>
             </div>
 
-            {createdItems.length === 0 ? (
+            {filteredItems.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Award className="w-12 h-12 text-indigo-500" />
+                  <Search className="w-12 h-12 text-indigo-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">No competitions yet</h3>
-                <p className="text-gray-600">Create your first competition to get started</p>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">No competitions found</h3>
+                <p className="text-gray-600">Try adjusting your search criteria</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {createdItems.map((item) => (
+                {filteredItems.map((item) => (
                   <div
                     key={item._id}
                     className="group bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20 hover:shadow-2xl hover:scale-105 transition-all duration-300"
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-2xl ${getCategoryColor(item.category)} shadow-lg`}>
+                      <div className={`p-2 px-3 rounded-md ${getCategoryColor(item.category)} shadow-lg flex items-center gap-2`}>
                         {getCategoryIcon(item.category)}
-                        <div className="text-white text-xs font-semibold mt-1">
+                        <div className="text-white text-xs font-semibold">
                           {item.category.toUpperCase()}
                         </div>
                       </div>

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Award, Calendar, Tag, CheckCircle, Circle, Loader2, ArrowLeft, Search, Filter } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import UserSidebar from '@/components/userSidebar';
 
 export default function ContestantDetailsPage() {
@@ -13,7 +14,6 @@ export default function ContestantDetailsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all', 'stage', 'offstage'
   const [categoryFilter, setCategoryFilter] = useState('all'); // Category filter
   const router = useRouter();
@@ -79,6 +79,35 @@ export default function ContestantDetailsPage() {
       return;
     }
 
+    // Check total items limit (max 10)
+    const totalItems = allPrograms.filter(p => p.participants.includes(id)).length;
+    if (!isRegistered && totalItems >= 10) {
+      toast.error('Maximum 10 items allowed per contestant.');
+      return;
+    }
+
+    // Check general(individual) participants limit (max 4 per student)
+    if (!isRegistered && programName.category === 'general(individual)') {
+      const generalIndividualItems = allPrograms.filter(p => 
+        p.category === 'general(individual)' && p.participants.includes(id)
+      ).length;
+      if (generalIndividualItems >= 4) {
+        toast.error('Maximum 4 general(individual) items allowed per student.');
+        return;
+      }
+    }
+
+    // Check general(group) participants limit (max 3 per group)
+    if (!isRegistered && programName.category === 'general(group)') {
+      const groupParticipants = allPrograms.filter(p => 
+        p.category === 'general(group)' && p.participants.includes(id)
+      ).length;
+      if (groupParticipants >= 3) {
+        toast.error('Maximum 3 participants allowed per group for general(group) items.');
+        return;
+      }
+    }
+
     try {
       const res = await fetch(`/api/contestants/${id}/items`, {
         method: 'POST',
@@ -100,13 +129,13 @@ export default function ContestantDetailsPage() {
               : program
           )
         );
-        setMessage({ type: 'success', text: `Program ${isRegistered ? 'removed' : 'added'} successfully!` });
+        toast.success(`Program ${isRegistered ? 'removed' : 'added'} successfully!`);
       } else {
-        setMessage({ type: 'error', text: data.message || 'Failed to update program.' });
+        toast.error(data.message || 'Failed to update program.');
       }
     } catch (error) {
       console.error('Toggle program error:', error);
-      setMessage({ type: 'error', text: 'Server error. Try again.' });
+      toast.error('Server error. Try again.');
     }
   };
 
@@ -143,20 +172,32 @@ export default function ContestantDetailsPage() {
   // Get unique categories from programs
   const categories = ['all', ...new Set(allPrograms.map(p => p.category?.toLowerCase() || 'general'))];
 
-  // Filter programs by contestant's category
-  const categoryFilteredPrograms = allPrograms.filter((p) =>
-    contestant?.category
-      ? p.category?.toLowerCase() === contestant.category.toLowerCase() ||
-        p.category?.toLowerCase() === 'general(individual)' ||
-        p.category?.toLowerCase() === 'general(group)'
-      : true // If no contestant.category, include all programs
+  // Filter programs for display: own category + general programs
+  const ownCategoryPrograms = allPrograms.filter(
+    (item) =>
+      contestant?.category &&
+      item.category?.toLowerCase() === contestant.category.toLowerCase()
   );
+  const generalPrograms = allPrograms.filter(
+    (item) =>
+      item.category?.toLowerCase() === 'general(individual)' ||
+      item.category?.toLowerCase() === 'general(group)'
+  );
+
+  const matchesSearchAndStage = (item) => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStage = filter === 'all' || item.stage === filter;
+    return matchesSearch && matchesStage;
+  };
+
+  const filteredOwnCategoryPrograms = ownCategoryPrograms.filter(matchesSearchAndStage);
+  const filteredGeneralPrograms = generalPrograms.filter(matchesSearchAndStage);
 
   // Calculate program counts based on category-filtered programs
   const programCounts = {
-    all: categoryFilteredPrograms.length,
-    stage: categoryFilteredPrograms.filter((p) => p.stage === 'stage').length,
-    offstage: categoryFilteredPrograms.filter((p) => p.stage === 'offstage').length,
+    all: allPrograms.length,
+    stage: allPrograms.filter((p) => p.stage === 'stage').length,
+    offstage: allPrograms.filter((p) => p.stage === 'offstage').length,
   };
 
   const categoryCounts = categories.reduce((acc, cat) => {
@@ -167,14 +208,6 @@ export default function ContestantDetailsPage() {
     }
     return acc;
   }, {});
-
-  const filteredPrograms = allPrograms.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStage = filter === 'all' || item.stage === filter;
-    const matchesCategory = categoryFilter === 'all' || item.category?.toLowerCase() === categoryFilter;
-    
-    return matchesSearch && matchesStage && matchesCategory;
-  });
 
   if (loading) {
     return (
@@ -206,6 +239,7 @@ export default function ContestantDetailsPage() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       <UserSidebar />
       <main className='flex-1 p-6 md:p-10'>
         <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
@@ -236,25 +270,6 @@ export default function ContestantDetailsPage() {
         </header>
 
         <div className="py-8">
-          {message && (
-            <div
-              className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${
-                message.type === 'success'
-                  ? 'bg-green-500/10 text-green-700 border border-green-200/50'
-                  : 'bg-red-500/10 text-red-700 border border-red-200/50'
-              }`}
-              onClick={() => setMessage(null)}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
-                />
-                <span className="font-medium">{message.text}</span>
-                <span className="text-sm opacity-70 ml-auto">Click to dismiss</span>
-              </div>
-            </div>
-          )}
-
           <div className="mb-8">
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20">
               <div className="flex items-center gap-4">
@@ -278,6 +293,26 @@ export default function ContestantDetailsPage() {
                     <Award className="w-4 h-4 mr-2" />
                     {allPrograms.filter(p => p.participants.includes(id)).length} Programs Registered
                   </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Registration Summary</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-indigo-50 p-4 rounded-xl">
+                  <p className="text-indigo-700 font-medium">Total</p>
+                  <p className="text-2xl font-bold text-indigo-900">{allPrograms.filter(p => p.participants.includes(id)).length}/10</p>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-xl">
+                  <p className="text-blue-700 font-medium">General (Individual)</p>
+                  <p className="text-2xl font-bold text-blue-900">{allPrograms.filter(p => p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)).length}/4</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-xl">
+                  <p className="text-green-700 font-medium">General (Group)</p>
+                  <p className="text-2xl font-bold text-green-900">{allPrograms.filter(p => p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)).length}/3</p>
                 </div>
               </div>
             </div>
@@ -343,7 +378,7 @@ export default function ContestantDetailsPage() {
           </div>
 
           <div>
-            {filteredPrograms.length === 0 ? (
+            {filteredOwnCategoryPrograms.length === 0 && filteredGeneralPrograms.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="w-12 h-12 text-indigo-500" />
@@ -354,41 +389,122 @@ export default function ContestantDetailsPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                {filteredPrograms.map((program) => {
-                  const isRegistered = program.participants.includes(id);
-                  return (
-                    <div key={program._id} className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1 px-2">
-                        {getCategoryIcon(program.category)}
-                        <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                          {(program.category || 'general').replace(/\(.*\)/, '')}
-                        </span>
-                      </div>
-
-                      <div
-                        className={`group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:scale-105 cursor-pointer min-h-[80px] flex items-center justify-center ${
-                          isRegistered 
-                            ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg' 
-                            : 'bg-gradient-to-br from-red-400 to-red-600 text-white shadow-lg'
-                        }`}
-                        onClick={() => handleToggleProgram(program._id, isRegistered, program.name)}
-                      >
-                        <h3 className="font-semibold text-center text-sm leading-tight text-white">
-                          {program.name}
-                        </h3>
-                        <div className="absolute top-2 right-2">
-                          {isRegistered ? (
-                            <CheckCircle className="w-4 h-4 text-white" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-white" />
-                          )}
-                        </div>
+              <>
+                {filteredOwnCategoryPrograms.length > 0 && (
+                  <div className="mb-8">
+                    <h4 className="text-lg font-bold mb-3 text-indigo-700">Your Category Programs</h4>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                      {filteredOwnCategoryPrograms.map((program) => {
+                        const isRegistered = program.participants.includes(id);
+                        return (
+                          <div key={program._id} className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1 px-2">
+                              {getCategoryIcon(program.category)}
+                              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                                {(program.category || 'general').replace(/\(.*\)/, '')}
+                              </span>
+                            </div>
+                            <div
+                              className={`group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:scale-105 cursor-pointer min-h-[80px] flex items-center justify-center ${
+                                isRegistered
+                                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg'
+                                  : 'bg-gradient-to-br from-red-400 to-red-600 text-white shadow-lg'
+                              }`}
+                              onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                            >
+                              <h3 className="font-semibold text-center text-sm leading-tight text-white">
+                                {program.name}
+                              </h3>
+                              <div className="absolute top-2 right-2">
+                                {isRegistered ? (
+                                  <CheckCircle className="w-4 h-4 text-white" />
+                                ) : (
+                                  <Circle className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                {filteredGeneralPrograms.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">General Programs <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-semibold">Common</span></h4>
+                    <div className="mb-6">
+                      <h5 className="text-md font-semibold mb-2 text-indigo-600">General (Individual)</h5>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                        {filteredGeneralPrograms.filter(p => p.category?.toLowerCase() === 'general(individual)').map((program) => {
+                          const isRegistered = program.participants.includes(id);
+                          return (
+                            <div key={program._id} className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1 px-2">
+                                {getCategoryIcon(program.category)}
+                                <span className="text-xs font-medium text-blue-700 uppercase tracking-wide">General (Individual)</span>
+                              </div>
+                              <div
+                                className={`group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:scale-105 cursor-pointer min-h-[80px] flex items-center justify-center ${
+                                  isRegistered
+                                    ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg'
+                                    : 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg'
+                                }`}
+                                onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                              >
+                                <h3 className="font-semibold text-center text-sm leading-tight text-white">
+                                  {program.name}
+                                </h3>
+                                <div className="absolute top-2 right-2">
+                                  {isRegistered ? (
+                                    <CheckCircle className="w-4 h-4 text-white" />
+                                  ) : (
+                                    <Circle className="w-4 h-4 text-white" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div>
+                      <h5 className="text-md font-semibold mb-2 text-indigo-600">General (Group)</h5>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                        {filteredGeneralPrograms.filter(p => p.category?.toLowerCase() === 'general(group)').map((program) => {
+                          const isRegistered = program.participants.includes(id);
+                          return (
+                            <div key={program._id} className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1 px-2">
+                                {getCategoryIcon(program.category)}
+                                <span className="text-xs font-medium text-blue-700 uppercase tracking-wide">General (Group)</span>
+                              </div>
+                              <div
+                                className={`group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:scale-105 cursor-pointer min-h-[80px] flex items-center justify-center ${
+                                  isRegistered
+                                    ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg'
+                                    : 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg'
+                                }`}
+                                onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                              >
+                                <h3 className="font-semibold text-center text-sm leading-tight text-white">
+                                  {program.name}
+                                </h3>
+                                <div className="absolute top-2 right-2">
+                                  {isRegistered ? (
+                                    <CheckCircle className="w-4 h-4 text-white" />
+                                  ) : (
+                                    <Circle className="w-4 h-4 text-white" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
