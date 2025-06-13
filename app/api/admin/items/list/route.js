@@ -19,8 +19,7 @@ export async function GET() {
   }
 }
 
-// Optional: method handling is implicit in App Router
-// If you want to explicitly handle other methods:
+// Handle unsupported methods
 export function POST() {
   return NextResponse.json(
     { success: false, message: 'Method Not Allowed' },

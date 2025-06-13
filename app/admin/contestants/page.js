@@ -9,6 +9,7 @@ export default function ContestantRegistration() {
     contestantNumber: "",
     name: "",
     groupName: "Ma'abariyah",
+    category: "subjunior",
     file: null,
   });
   const [contestants, setContestants] = useState([]);
@@ -38,7 +39,7 @@ export default function ContestantRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.contestantNumber || !form.name || !form.groupName) {
+    if (!form.contestantNumber || !form.name || !form.groupName || !form.category) {
       setMessage({ type: "error", text: "Please fill all required fields." });
       return;
     }
@@ -47,6 +48,7 @@ export default function ContestantRegistration() {
     formData.append("contestantNumber", form.contestantNumber);
     formData.append("name", form.name);
     formData.append("groupName", form.groupName);
+    formData.append("category", form.category);
     if (form.file) formData.append("file", form.file);
 
     try {
@@ -54,7 +56,13 @@ export default function ContestantRegistration() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage({ type: "success", text: "Contestant registered successfully!" });
-      setForm({ contestantNumber: "", name: "", groupName: "Ma'abariyah", file: null });
+      setForm({
+        contestantNumber: "",
+        name: "",
+        groupName: "Ma'abariyah",
+        category: "subjunior",
+        file: null,
+      });
       const updated = await axios.get("/api/admin/contestants");
       setContestants(updated.data.contestants || []);
     } catch (error) {
@@ -94,7 +102,13 @@ export default function ContestantRegistration() {
             </div>
             <button
               onClick={() =>
-                setForm({ contestantNumber: "", name: "", groupName: "Ma'abariyah", file: null })
+                setForm({
+                  contestantNumber: "",
+                  name: "",
+                  groupName: "Ma'abariyah",
+                  category: "subjunior",
+                  file: null,
+                })
               }
               className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 transform hover:scale-105"
             >
@@ -117,7 +131,11 @@ export default function ContestantRegistration() {
             onClick={() => setMessage(null)}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full ${message.type === "success" ? "bg-green-500" : "bg-red-500"}`}></div>
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  message.type === "success" ? "bg-green-500" : "bg-red-500"
+                }`}
+              ></div>
               <span className="font-medium">{message.text}</span>
               <span className="text-sm opacity-70 ml-auto">Click to dismiss</span>
             </div>
@@ -175,8 +193,26 @@ export default function ContestantRegistration() {
                   className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
                 >
                   <option value="Ma'abariyah">Ma'abariyah</option>
-                  <option value="Fakhriyah">Fakhriyah</option>
-                  <option value="Nizamiyah">Nizamiyah</option>
+                  <option value="team1">team1</option>
+                  <option value="team2">team2</option>
+                  <option value="team3">team3</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
+                >
+                  <option value="subjunior">Subjunior</option>
+                  <option value="junior">Junior</option>
+                  <option value="senior">Senior</option>
                 </select>
               </div>
 
@@ -247,6 +283,12 @@ export default function ContestantRegistration() {
                       {contestant.name}
                     </h3>
                     <p className="text-gray-600 text-sm">Group: {contestant.groupName}</p>
+                    <p className="text-gray-600 text-sm">
+                      Category:{" "}
+                      {contestant.category
+                        ? contestant.category.charAt(0).toUpperCase() + contestant.category.slice(1)
+                        : "Not specified"}
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-end pt-4 border-t border-gray-200">

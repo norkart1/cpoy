@@ -207,7 +207,7 @@ const response = await fetch(`/api/manege-contestants?groupName=${encodeURICompo
                       scope="col"
                       className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
                     >
-                      General Ind.
+                      General Ind.Status
                     </th>
                     <th
                       scope="col"

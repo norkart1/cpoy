@@ -1,216 +1,8 @@
-// 'use client';
-
-// import { useState, useEffect } from 'react';
-// import Link from 'next/link';
-// import { ArrowRightCircle, Loader2 } from 'lucide-react';
-// import UserSidebar from '@/components/userSidebar';
-
-// export default function ContestantsPage() {
-//     const [contestants, setContestants] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [error, setError] = useState(null);
-
-//     const groupName = 'Fakhriyah';
-
-//     useEffect(() => {
-//         async function fetchContestants() {
-//             try {
-//                 const response = await fetch(`/api/manege-contestants?groupName=${encodeURIComponent(groupName)}`);
-//                 const result = await response.json();
-
-//                 if (result.success) {
-//                     setContestants(result.data);
-//                 } else {
-//                     setError(result.error || 'Failed to load contestants');
-//                 }
-//             } catch (err) {
-//                 setError('An error occurred while fetching contestants');
-//             } finally {
-//                 setLoading(false);
-//             }
-//         }
-
-//         fetchContestants();
-//     }, []);
-
-//     if (loading) {
-//         return (
-//             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-//                 <div className="flex flex-col items-center gap-4">
-//                     <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-//                     <p className="text-lg font-medium text-gray-700">Loading contestants...</p>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     if (error) {
-//         return (
-//             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-//                 <div className="bg-white rounded-2xl p-6 shadow-lg border border-red-100">
-//                     <p className="text-red-600 text-lg font-semibold">{error}</p>
-//                     <Link
-//                         href="/"
-//                         className="mt-4 inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium"
-//                     >
-//                         Back to Home
-//                     </Link>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     return (
-//         <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-//             <UserSidebar />
-//             <main className="flex-1 p-6 md:p-10">
-//                 {/* Header */}
-//                 <header className="bg-white/90 backdrop-blur-md sticky top-0 z-20 shadow-sm">
-//                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-//                         <div>
-//                             <h1 className="text-2xl font-bold text-gray-900">Contestants</h1>
-//                             <p className="text-sm text-gray-500">Group: {groupName}</p>
-//                         </div>
-//                         <Link
-//                             href="/"
-//                             className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
-//                         >
-//                             Back to Home
-//                         </Link>
-//                     </div>
-//                 </header>
-
-//                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-//                     {contestants.length === 0 ? (
-//                         <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
-//                             <p className="text-gray-500 text-sm font-medium">No contestants found for this group.</p>
-//                         </div>
-//                     ) : (
-//                         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-//                             <div className="overflow-x-auto">
-//                                 <table className="min-w-full divide-y divide-gray-200">
-//                                     <thead className="bg-gray-50">
-//                                         <tr>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 No.
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 Name
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 Off Stage
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 On Stage
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 General Ind.
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 General Group
-//                                             </th>
-//                                             <th
-//                                                 scope="col"
-//                                                 className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
-//                                             >
-//                                                 Details
-//                                             </th>
-//                                         </tr>
-//                                     </thead>
-//                                     <tbody className="divide-y divide-gray-100">
-//                                         {contestants.map((contestant, index) => (
-//                                             <tr
-//                                                 key={contestant._id || index}
-//                                                 className="hover:bg-gray-50 transition-colors duration-200"
-//                                             >
-//                                                 <td className="px-6 py-4 text-sm text-gray-900">
-//                                                     {contestant.contestantNumber || 'N/A'}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
-//                                                     {contestant.name || 'N/A'}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-center text-sm text-gray-700">
-//                                                     {contestant.offStage ? (
-//                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-//                                                             ✓
-//                                                         </span>
-//                                                     ) : (
-//                                                         '—'
-//                                                     )}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-center text-sm text-gray-700">
-//                                                     {contestant.onStage ? (
-//                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-//                                                             ✓
-//                                                         </span>
-//                                                     ) : (
-//                                                         '—'
-//                                                     )}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-center text-sm text-gray-700">
-//                                                     {contestant.generalIndividual ? (
-//                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold text-gray-800">
-//                                                             {contestant.generalIndividual}
-//                                                         </span>
-//                                                     ) : (
-//                                                         '—'
-//                                                     )}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-center text-sm text-gray-700">
-//                                                     {contestant.generalGroup ? (
-//                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold text-gray-800">
-//                                                             {contestant.generalGroup}
-//                                                         </span>
-//                                                     ) : (
-//                                                         '—'
-//                                                     )}
-//                                                 </td>
-//                                                 <td className="px-6 py-4 text-right">
-//                                                     <Link
-//                                                         href={`/team-panel/contestant/${contestant._id}`}
-//                                                         className="inline-flex items-center justify-center w-8 h-8 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-//                                                         aria-label={`View details for contestant ${contestant.name}`}
-//                                                     >
-//                                                         <ArrowRightCircle className="w-5 h-5" />
-//                                                     </Link>
-//                                                 </td>
-//                                             </tr>
-//                                         ))}
-//                                     </tbody>
-//                                 </table>
-//                             </div>
-//                         </div>
-//                     )}
-//                 </main>
-//             </main>
-//         </div>
-
-//     );
-// }
-
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Add useRouter
 import { 
     ArrowRightCircle, 
     Loader2, 
@@ -225,8 +17,11 @@ import {
     Clock
 } from 'lucide-react';
 import UserSidebar from '@/components/userSidebar';
+import { useSession } from 'next-auth/react';
 
 export default function ContestantsPage() {
+    const { data: session, status } = useSession();
+    const router = useRouter(); // Initialize router
     const [contestants, setContestants] = useState([]);
     const [filteredContestants, setFilteredContestants] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -234,9 +29,11 @@ export default function ContestantsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
-    const groupName = 'Fakhriyah';
+    const groupName = session?.user?.name;
 
     useEffect(() => {
+        console.log(session);
+        
         async function fetchContestants() {
             try {
                 const response = await fetch(`/api/manege-contestants?groupName=${encodeURIComponent(groupName)}`);
@@ -255,8 +52,10 @@ export default function ContestantsPage() {
             }
         }
 
-        fetchContestants();
-    }, []);
+        if (groupName) {
+            fetchContestants();
+        }
+    }, [groupName]);
 
     // Filter contestants based on search and status
     useEffect(() => {
@@ -275,11 +74,11 @@ export default function ContestantsPage() {
             filtered = filtered.filter(contestant => {
                 switch (statusFilter) {
                     case 'completed':
-                        return contestant.offStage && contestant.onStage;
+                        return contestant.offstage && contestant.stage;
                     case 'partial':
-                        return (contestant.offStage && !contestant.onStage) || (!contestant.offStage && contestant.onStage);
+                        return (contestant.offstage && !contestant.stage) || (!contestant.offstage && contestant.stage);
                     case 'pending':
-                        return !contestant.offStage && !contestant.onStage;
+                        return !contestant.offstage && !contestant.stage;
                     default:
                         return true;
                 }
@@ -290,14 +89,14 @@ export default function ContestantsPage() {
     }, [contestants, searchTerm, statusFilter]);
 
     const getStatusBadge = (contestant) => {
-        if (contestant.offStage && contestant.onStage) {
+        if (contestant.offstage && contestant.stage) {
             return (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="w-3 h-3" />
                     Completed
                 </span>
             );
-        } else if (contestant.offStage || contestant.onStage) {
+        } else if (contestant.offstage || contestant.stage) {
             return (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
                     <Clock className="w-3 h-3" />
@@ -315,11 +114,15 @@ export default function ContestantsPage() {
     };
 
     const getCompletionStats = () => {
-        const completed = contestants.filter(c => c.offStage && c.onStage).length;
-        const inProgress = contestants.filter(c => (c.offStage && !c.onStage) || (!c.offStage && c.onStage)).length;
-        const pending = contestants.filter(c => !c.offStage && !c.onStage).length;
+        const completed = contestants.filter(c => c.offstage && c.stage).length;
+        const inProgress = contestants.filter(c => (c.offstage && !c.stage) || (!c.offstage && c.stage)).length;
+        const pending = contestants.filter(c => !c.offstage && c.stage).length;
         
         return { completed, inProgress, pending, total: contestants.length };
+    };
+
+    const handleRowClick = (id) => {
+        router.push(`/team-panel/contestant/${id}`); // Redirect to contestant details
     };
 
     if (loading) {
@@ -369,7 +172,6 @@ export default function ContestantsPage() {
         <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <UserSidebar />
             <main className="flex-1 overflow-hidden">
-                {/* Modern Header with Glass Effect */}
                 <header className="bg-white/70 backdrop-blur-xl sticky top-0 z-30 border-b border-white/20 shadow-lg shadow-indigo-500/5">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
                         <div className="flex flex-col lg:flex-row gap-6 lg:items-center justify-between">
@@ -403,59 +205,10 @@ export default function ContestantsPage() {
                                 </Link>
                             </div>
                         </div>
-
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                                        <Users className="w-5 h-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Completed</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-amber-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">In Progress</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-gray-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Pending</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </header>
 
                 <div className="px-6 lg:px-8 py-8">
-                    {/* Search and Filter Bar */}
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20 shadow-lg">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="relative flex-1">
@@ -484,7 +237,6 @@ export default function ContestantsPage() {
                         </div>
                     </div>
 
-                    {/* Contestants Table */}
                     {filteredContestants.length === 0 ? (
                         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center shadow-lg border border-white/20">
                             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -522,9 +274,6 @@ export default function ContestantsPage() {
                                                 Contestant
                                             </th>
                                             <th className="px-8 py-6 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th className="px-8 py-6 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                                                 Off Stage
                                             </th>
                                             <th className="px-8 py-6 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -536,16 +285,14 @@ export default function ContestantsPage() {
                                             <th className="px-8 py-6 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                                                 Group Score
                                             </th>
-                                            <th className="px-8 py-6 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                Actions
-                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100/50">
+                                    <tbody className="divide-y text-black divide-gray-100/50">
                                         {filteredContestants.map((contestant, index) => (
                                             <tr
                                                 key={contestant._id || index}
-                                                className="hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-300 group"
+                                                className="hover:bg-gradient-to-r hover:from-indigo-50/30 hover:to-purple-50/30 transition-all duration-300 group cursor-pointer"
+                                                onClick={() => handleRowClick(contestant._id)} // Add click handler
                                             >
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center gap-3">
@@ -556,7 +303,7 @@ export default function ContestantsPage() {
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold text-lg shadow-sm">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold text-lg">
                                                             {contestant.name ? contestant.name.charAt(0).toUpperCase() : 'N'}
                                                         </div>
                                                         <div>
@@ -564,73 +311,24 @@ export default function ContestantsPage() {
                                                                 {contestant.name || 'N/A'}
                                                             </p>
                                                             <p className="text-sm text-gray-500">
-                                                                Contestant #{contestant.contestantNumber || 'N/A'}
+                                                                {contestant.category ? 
+                                                                    contestant.category.charAt(0).toUpperCase() + contestant.category.slice(1) : 
+                                                                    'N/A'}
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
-                                                    {getStatusBadge(contestant)}
+                                                    {contestant.offstage || 0}
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
-                                                    {contestant.offStage ? (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                            <CheckCircle2 className="w-4 h-4" />
-                                                            Completed
-                                                        </div>
-                                                    ) : (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-50 text-gray-500 border border-gray-200">
-                                                            <Clock className="w-4 h-4" />
-                                                            Pending
-                                                        </div>
-                                                    )}
+                                                    {contestant.stage || 0}
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
-                                                    {contestant.onStage ? (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                            <CheckCircle2 className="w-4 h-4" />
-                                                            Completed
-                                                        </div>
-                                                    ) : (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-50 text-gray-500 border border-gray-200">
-                                                            <Clock className="w-4 h-4" />
-                                                            Pending
-                                                        </div>
-                                                    )}
+                                                    {contestant.generalIndividual || 0}
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
-                                                    {contestant.generalIndividual ? (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-lg font-bold bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 border border-indigo-200">
-                                                            <Trophy className="w-4 h-4" />
-                                                            {contestant.generalIndividual}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-gray-400 text-sm">Not scored</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-8 py-6 text-center">
-                                                    {contestant.generalGroup ? (
-                                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-lg font-bold bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border border-emerald-200">
-                                                            <Trophy className="w-4 h-4" />
-                                                            {contestant.generalGroup}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-gray-400 text-sm">Not scored</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-8 py-6 text-center">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <Link
-                                                            href={`/team-panel/contestant/${contestant._id}`}
-                                                            className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 hover:scale-110 hover:shadow-xl transform group-hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                            aria-label={`View details for contestant ${contestant.name}`}
-                                                        >
-                                                            <Eye className="w-5 h-5" />
-                                                        </Link>
-                                                        <button className="inline-flex items-center justify-center w-12 h-12 bg-white text-gray-600 rounded-2xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                                            <MoreVertical className="w-5 h-5" />
-                                                        </button>
-                                                    </div>
+                                                    {contestant.generalGroup || 0}
                                                 </td>
                                             </tr>
                                         ))}
@@ -640,7 +338,6 @@ export default function ContestantsPage() {
                         </div>
                     )}
 
-                    {/* Results Summary */}
                     {filteredContestants.length > 0 && (
                         <div className="mt-6 bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
                             <p className="text-sm text-gray-600 text-center">

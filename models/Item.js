@@ -9,7 +9,7 @@ const ItemSchema = new mongoose.Schema({
   },
   type: { 
     type: String, 
-    enum: ['C', 'A', 'B'], 
+    enum: ['C', 'A'], 
     required: true 
   },
   stage: { 

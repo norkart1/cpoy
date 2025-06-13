@@ -1,9 +1,13 @@
 import dbConnect from '@/lib/dbConnect';
 import Item from '@/models/Item';
+import Contestant from '@/models/Contestant'; // Add this import
 import { NextResponse } from 'next/server';
 
+// Ensure the Contestant model is registered by importing it
+console.log(Contestant); // Optional: Log to confirm the model is loaded
+
 export async function GET(request, { params }) {
-  const { id } = await params; 
+  const { id } = await params;
 
   await dbConnect();
   console.log('itemId:', id);

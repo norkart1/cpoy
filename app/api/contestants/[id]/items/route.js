@@ -1,68 +1,50 @@
-
+import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
+import Item from '@/models/Item';
 import connectToDatabase from '@/lib/dbConnect';
 
-export async function POST(request, { params }) {
+export async function POST(req, { params }) {
   try {
-    // Await params to handle dynamic route correctly
-    const { id } = await params;
+    await connectToDatabase();
+    const { id } = params;
+    const { programId, action } = await req.json();
 
-    // Parse request body
-    const { itemId, isRegistered } = await request.json();
-    if (!itemId || typeof isRegistered !== 'boolean') {
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(programId)) {
       return NextResponse.json(
-        { success: false, message: 'Invalid request body' },
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { success: false, message: 'Invalid contestant or program ID' },
+        { status: 400 }
       );
     }
 
-    // Connect to MongoDB
-    const db = await connectToDatabase();
-    const contestantsCollection = db.collection('contestants');
-
-    // Find contestant
-    const contestant = await contestantsCollection.findOne({ _id: id });
-    if (!contestant) {
+    const item = await Item.findById(programId);
+    if (!item) {
       return NextResponse.json(
-        { success: false, message: 'Contestant not found' },
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
+        { success: false, message: 'Program not found' },
+        { status: 404 }
       );
     }
 
-    // Update registeredItems
-    let updatedRegisteredItems = contestant.registeredItems || [];
-    if (isRegistered) {
-      // Remove itemId if registered (unregister)
-      updatedRegisteredItems = updatedRegisteredItems.filter((iid) => iid !== itemId);
-    } else {
-      // Add itemId if not registered (register)
-      if (!updatedRegisteredItems.includes(itemId)) {
-        updatedRegisteredItems.push(itemId);
+    if (action === 'add') {
+      if (!item.participants.includes(id)) {
+        item.participants.push(id);
+        await item.save();
       }
-    }
-
-    // Update contestant in database
-    const updateResult = await contestantsCollection.updateOne(
-      { _id: id },
-      { $set: { registeredItems: updatedRegisteredItems } }
-    );
-
-    if (updateResult.modifiedCount === 0) {
+    } else if (action === 'remove') {
+      item.participants = item.participants.filter(pid => pid.toString() !== id);
+      await item.save();
+    } else {
       return NextResponse.json(
-        { success: false, message: 'Failed to update contestant' },
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { success: false, message: 'Invalid action' },
+        { status: 400 }
       );
     }
 
-    return NextResponse.json(
-      { success: true, message: 'Item registration updated' },
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return NextResponse.json({ success: true, message: 'Program updated successfully' });
   } catch (error) {
-    console.error('API Error:', error.message);
+    console.error('Error updating program:', error);
     return NextResponse.json(
-      { success: false, message: 'Server error' },
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { success: false, message: 'Failed to update program' },
+      { status: 500 }
     );
   }
 }
