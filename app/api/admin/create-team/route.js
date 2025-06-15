@@ -10,7 +10,7 @@ export async function POST(request) {
     // Parse request body
     // const { teamName, password } = await request.json();
 
-    let teamName="team1"
+    let teamName="admin"
     let password="21"
 
     // Validate input
