@@ -1,6 +1,3 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { 
   Award, 
@@ -18,13 +15,6 @@ import {
 } from "lucide-react";
 
 export default async function AdminDashboardPage() {
-  const session = await getServerSession(authOptions);
-
-  // Redirect to admin-login if no session exists or user.name is not "admin"
-  if (!session || session.user.name !== "admin") {
-    redirect("/admin-login");
-  }
-
   // Quick stats data (you can fetch this from your API)
   const stats = [
     {
@@ -158,7 +148,7 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <>
       {/* Header Section */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -167,7 +157,7 @@ export default async function AdminDashboardPage() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">Welcome back, {session.user.name}! Manage your fest competitions</p>
+              <p className="text-gray-600 mt-1">Welcome back, admin! Manage your fest competitions</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
@@ -175,7 +165,7 @@ export default async function AdminDashboardPage() {
                 <p className="text-sm font-semibold text-gray-800">{new Date().toLocaleDateString()}</p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                {session.user.name.charAt(0).toUpperCase()}
+                A
               </div>
             </div>
           </div>
@@ -227,7 +217,7 @@ export default async function AdminDashboardPage() {
                 </div>
               </Link>
             ))}
-          </div>
+        </div>
         </div>
 
         {/* Dashboard Content Grid */}
@@ -313,6 +303,6 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

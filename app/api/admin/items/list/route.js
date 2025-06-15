@@ -1,3 +1,5 @@
+// app\api\admin\items\list\route.js
+
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/dbConnect';
 import Item from '@/models/Item';
