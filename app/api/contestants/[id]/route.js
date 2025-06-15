@@ -1,3 +1,5 @@
+// app\api\contestants\[id]\route.js
+
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 import Contestant from '@/models/Contestant';

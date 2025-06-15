@@ -1,3 +1,5 @@
+// app\api\contestants\route.js
+
 import Contestant from "@/models/Contestant";
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";

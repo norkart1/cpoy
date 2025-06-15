@@ -14,7 +14,7 @@ export default function ContestantDetailsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all', 'stage', 'offstage'
+  const [filter, setFilter] = useState('stage'); // 'all', 'stage', 'offstage'
   const [categoryFilter, setCategoryFilter] = useState('all'); // Category filter
   const router = useRouter();
   const { id } = useParams();
@@ -74,37 +74,47 @@ export default function ContestantDetailsPage() {
     }
   }, [id]);
 
-  const handleToggleProgram = async (programId, isRegistered, programName) => {
-    if (!confirm(`Are you sure you want to ${isRegistered ? 'remove' : 'add'} "${programName}" for this contestant?`)) {
+  const handleToggleProgram = async (programId, isRegistered, program) => {
+    if (!confirm(`Are you sure you want to ${isRegistered ? 'remove' : 'add'} "${program.name}" for this contestant?`)) {
       return;
     }
 
-    // Check total items limit (max 10)
-    const totalItems = allPrograms.filter(p => p.participants.includes(id)).length;
-    if (!isRegistered && totalItems >= 10) {
-      toast.error('Maximum 10 items allowed per contestant.');
-      return;
-    }
-
-    // Check general(individual) participants limit (max 4 per student)
-    if (!isRegistered && programName.category === 'general(individual)') {
-      const generalIndividualItems = allPrograms.filter(p => 
-        p.category === 'general(individual)' && p.participants.includes(id)
-      ).length;
-      if (generalIndividualItems >= 4) {
-        toast.error('Maximum 4 general(individual) items allowed per student.');
+    if (!isRegistered) {
+      // Check total items limit (max 10)
+      const totalItems = allPrograms.filter(p => p.participants.includes(id)).length;
+      if (totalItems >= 10) {
+        toast.error('Maximum 10 items allowed per contestant.');
         return;
       }
-    }
 
-    // Check general(group) participants limit (max 3 per group)
-    if (!isRegistered && programName.category === 'general(group)') {
-      const groupParticipants = allPrograms.filter(p => 
-        p.category === 'general(group)' && p.participants.includes(id)
-      ).length;
-      if (groupParticipants >= 3) {
-        toast.error('Maximum 3 participants allowed per group for general(group) items.');
-        return;
+      // Check general(individual) participants limit (max 4 per student)
+      if (program.category?.toLowerCase() === 'general(individual)') {
+        const generalIndividualItems = allPrograms.filter(p => 
+          p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)
+        ).length;
+        if (generalIndividualItems >= 4) {
+          toast.error('Maximum 4 general(individual) items allowed per student.');
+          return;
+        }
+
+        // New restriction: max 3 contestants from the same team in a general(individual) item
+        const programParticipants = allPrograms.find(p => p._id === programId)?.participants || [];
+        const teamParticipants = await fetchTeamParticipants(programParticipants, contestant.groupName);
+        if (teamParticipants >= 3) {
+          toast.error('Maximum 3 contestants from the same team allowed in this general(individual) item.');
+          return;
+        }
+      }
+
+      // Check general(group) participants limit (max 3 per group)
+      if (program.category?.toLowerCase() === 'general(group)') {
+        const groupParticipants = allPrograms.filter(p => 
+          p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)
+        ).length;
+        if (groupParticipants >= 3) {
+          toast.error('Maximum 3 participants allowed per group for general(group) items.');
+          return;
+        }
       }
     }
 
@@ -118,15 +128,15 @@ export default function ContestantDetailsPage() {
 
       if (data.success) {
         setAllPrograms((prev) =>
-          prev.map((program) =>
-            program._id === programId
+          prev.map((p) =>
+            p._id === programId
               ? {
-                  ...program,
+                  ...p,
                   participants: isRegistered
-                    ? program.participants.filter((pid) => pid.toString() !== id)
-                    : [...program.participants, id],
+                    ? p.participants.filter((pid) => pid.toString() !== id)
+                    : [...p.participants, id],
                 }
-              : program
+              : p
           )
         );
         toast.success(`Program ${isRegistered ? 'removed' : 'added'} successfully!`);
@@ -136,6 +146,23 @@ export default function ContestantDetailsPage() {
     } catch (error) {
       console.error('Toggle program error:', error);
       toast.error('Server error. Try again.');
+    }
+  };
+
+  // Helper function to fetch team participants for a specific program
+  const fetchTeamParticipants = async (participantIds, groupName) => {
+    try {
+      const res = await fetch(`/api/contestants/team-count?groupName=${encodeURIComponent(groupName)}&participantIds=${participantIds.join(',')}`);
+      const data = await res.json();
+      if (data.success) {
+        return data.count;
+      } else {
+        throw new Error(data.message || 'Failed to fetch team participants');
+      }
+    } catch (error) {
+      console.error('Fetch team participants error:', error);
+      toast.error('Error checking team participants.');
+      return 0; // Fallback to allow registration if check fails
     }
   };
 
@@ -310,9 +337,9 @@ export default function ContestantDetailsPage() {
                   <p className="text-blue-700 font-medium">General (Individual)</p>
                   <p className="text-2xl font-bold text-blue-900">{allPrograms.filter(p => p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)).length}/4</p>
                 </div>
-                <div className="bg-green-50 p-4 rounded-xl">
-                  <p className="text-green-700 font-medium">General (Group)</p>
-                  <p className="text-2xl font-bold text-green-900">{allPrograms.filter(p => p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)).length}/3</p>
+                <div className="bg-pink-50 p-4 rounded-xl">
+                  <p className="text-pink-700 font-medium">General (Group)</p>
+                  <p className="text-2xl font-bold text-pink-900">{allPrograms.filter(p => p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)).length}/3</p>
                 </div>
               </div>
             </div>
@@ -323,8 +350,7 @@ export default function ContestantDetailsPage() {
               <Filter className="w-5 h-5" />
               Filter by Category
             </h3>
-            {/* Commented out as per original code */}
-            {/* <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <button
                   key={category}
@@ -339,12 +365,12 @@ export default function ContestantDetailsPage() {
                   <span className="ml-2 text-xs opacity-75">({categoryCounts[category] || 0})</span>
                 </button>
               ))}
-            </div> */}
+            </div>
           </div>
 
           <div className="mb-6">
             <div className="flex gap-2 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/20">
-              <button
+              {/* <button
                 onClick={() => setFilter('all')}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
                   filter === 'all'
@@ -353,7 +379,7 @@ export default function ContestantDetailsPage() {
                 }`}
               >
                 All Stages ({programCounts.all})
-              </button>
+              </button> */}
               <button
                 onClick={() => setFilter('stage')}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${

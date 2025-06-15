@@ -1,6 +1,3 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Award,
@@ -19,13 +16,6 @@ import {
 import AdminSidebar from '@/components/adminSidebar';
 
 export default async function AdminDashboardPage() {
-  const session = await getServerSession(authOptions);
-
-  // Redirect to admin-login if no session exists or user.name is not "admin"
-  if (!session || session.user.name !== "admin") {
-    redirect("/admin-login");
-  }
-
   // Quick stats data (you can fetch this from your API)
   const stats = [
     {
