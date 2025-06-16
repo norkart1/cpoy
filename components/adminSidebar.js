@@ -5,13 +5,20 @@ import { Menu, X } from "lucide-react"; // or use Heroicons
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
+// You can fetch this from DB or define manually
+const groups = ["QUDWATHULULAMA", "SUHBATHUSSADATH", "NUSRATHULUMARA"];
 const menuItems = [
   { label: "Dashboard", href: "/admin", icon: "home" },
   { label: "Contestants", href: "/admin/contestants", icon: "users" },
   { label: "Programs", href: "/admin/add-item", icon: "activity" },
   { label: "Juries", href: "/admin/juries", icon: "file-text" },
-  // { label: "Exam", href: "/user/student-portal/exam", icon: "file-text" }
+  ...groups.map((g) => ({
+    label: g,
+    href: `/admin/groups/${encodeURIComponent(g)}`,
+    icon: "user",
+  })),
 ];
+
 
 export default function StudentPortalSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,9 +38,8 @@ export default function StudentPortalSidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } lg:relative lg:translate-x-0 lg:shadow-lg`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          } lg:relative lg:translate-x-0 lg:shadow-lg`}
       >
         {/* Close button (mobile only) */}
         <button
@@ -61,22 +67,27 @@ export default function StudentPortalSidebar() {
         </div>
 
         {/* Menu Items */}
-        <nav className="mt-6 px-4">
-          <ul className="space-y-1">
+        <nav className="mt-8 px-4">
+          <ul className="space-y-2">
             {menuItems.map((item, index) => (
               <li key={index}>
                 <Link
                   href={item.href}
-                  className={`flex items-center px-4 py-3 rounded-xl transition-colors ${
-                    isActive(item.href)
-                      ? "bg-white bg-opacity-20 text-white font-medium"
-                      : "text-indigo-100 hover:bg-white hover:bg-opacity-10"
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group
+            ${isActive(item.href)
+                      ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
+                      : "text-indigo-100 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
-                  <span className="inline-flex items-center justify-center w-8">
+                  {/* Icon */}
+                  <span className="inline-flex items-center justify-center text-lg w-8 h-8 rounded-md bg-white/10 text-white group-hover:bg-white/20">
                     <i className={`fas fa-${item.icon}`}></i>
                   </span>
-                  <span className="ml-3">{item.label}</span>
+
+                  {/* Label */}
+                  <span className="text-[16px] tracking-wide">{item.label}</span>
+
+                  {/* Active Dot */}
                   {isActive(item.href) && (
                     <span className="ml-auto h-2 w-2 rounded-full bg-white"></span>
                   )}
@@ -85,6 +96,7 @@ export default function StudentPortalSidebar() {
             ))}
           </ul>
         </nav>
+
 
         {/* User Profile */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
