@@ -1,4 +1,4 @@
-import { connectDB } from '@/lib/db';
+import { connectDB } from '@/lib/dbConnect';
 import Item from '@/models/Item';
 import Jury from '@/models/Jury';
 
