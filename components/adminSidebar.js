@@ -12,6 +12,7 @@ const menuItems = [
   { label: "Contestants", href: "/admin/contestants", icon: "users" },
   { label: "Programs", href: "/admin/add-item", icon: "activity" },
   { label: "Juries", href: "/admin/juries", icon: "file-text" },
+  { label: "Create Team", href: "/admin/create-team", icon: "file-text" },
   ...groups.map((g) => ({
     label: g,
     href: `/admin/groups/${encodeURIComponent(g)}`,
