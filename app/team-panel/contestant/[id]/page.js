@@ -89,7 +89,7 @@ export default function ContestantDetailsPage() {
 
       // Check general(individual) participants limit (max 4 per student)
       if (program.category?.toLowerCase() === 'general(individual)') {
-        const generalIndividualItems = allPrograms.filter(p => 
+        const generalIndividualItems = allPrograms.filter(p =>
           p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)
         ).length;
         if (generalIndividualItems >= 4) {
@@ -108,7 +108,7 @@ export default function ContestantDetailsPage() {
 
       // Check general(group) participants limit (max 3 per group)
       if (program.category?.toLowerCase() === 'general(group)') {
-        const groupParticipants = allPrograms.filter(p => 
+        const groupParticipants = allPrograms.filter(p =>
           p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)
         ).length;
         if (groupParticipants >= 3) {
@@ -131,11 +131,11 @@ export default function ContestantDetailsPage() {
           prev.map((p) =>
             p._id === programId
               ? {
-                  ...p,
-                  participants: isRegistered
-                    ? p.participants.filter((pid) => pid.toString() !== id)
-                    : [...p.participants, id],
-                }
+                ...p,
+                participants: isRegistered
+                  ? p.participants.filter((pid) => pid.toString() !== id)
+                  : [...p.participants, id],
+              }
               : p
           )
         );
@@ -276,7 +276,7 @@ export default function ContestantDetailsPage() {
                 {contestant.name || 'Contestant'}
               </h1>
               <p className="text-gray-600 mt-1">
-                No. {contestant.contestantNumber || 'N/A'} • Group: {contestant.groupName || 'N/A'} • 
+                No. {contestant.contestantNumber || 'N/A'} • Group: {contestant.groupName || 'N/A'} •
                 Category: {contestant.category ? contestant.category.charAt(0).toUpperCase() + contestant.category.slice(1) : 'N/A'}
               </p>
             </div>
@@ -345,7 +345,7 @@ export default function ContestantDetailsPage() {
             </div>
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <Filter className="w-5 h-5" />
               Filter by Category
@@ -355,20 +355,23 @@ export default function ContestantDetailsPage() {
                 <button
                   key={category}
                   onClick={() => setCategoryFilter(category)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                    categoryFilter === category
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                      : 'bg-white/60 text-gray-700 hover:bg-white/80 border border-white/20'
-                  }`}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${categoryFilter === category
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                    : 'bg-white/60 text-gray-700 hover:bg-white/80 border border-white/20'
+                    }`}
                 >
-                  {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)} 
+                  {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)}
                   <span className="ml-2 text-xs opacity-75">({categoryCounts[category] || 0})</span>
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <Filter className="w-5 h-5" />
+              Filter by Stage
+            </h3>
             <div className="flex gap-2 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/20">
               {/* <button
                 onClick={() => setFilter('all')}
@@ -382,28 +385,163 @@ export default function ContestantDetailsPage() {
               </button> */}
               <button
                 onClick={() => setFilter('stage')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                  filter === 'stage'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${filter === 'stage'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-gray-100'
+                  }`}
               >
                 On Stage ({programCounts.stage})
               </button>
               <button
                 onClick={() => setFilter('offstage')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                  filter === 'offstage'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${filter === 'offstage'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-gray-100'
+                  }`}
               >
                 Off Stage ({programCounts.offstage})
               </button>
             </div>
           </div>
-
           <div>
+            {filteredOwnCategoryPrograms.length === 0 && filteredGeneralPrograms.length === 0 ? (
+              <div className="text-center py-6 bg-indigo-100/20 backdrop-blur-md rounded-xl border border-indigo-200/50 shadow-md max-w-md mx-auto">
+                <div className="w-14 h-14 bg-gradient-to-br from-indigo-200/50 to-purple-200/50 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Award className="w-7 h-7 text-indigo-500" />
+                </div>
+                <h3 className="text-base font-medium text-gray-700 mb-1">No Programs Found</h3>
+                <p className="text-xs text-gray-500 max-w-xs mx-auto">
+                  Try adjusting your filters or search query to find programs.
+                </p>
+              </div>
+            ) : (
+              <>
+                {filteredOwnCategoryPrograms.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-base font-semibold text-indigo-600 mb-2 flex items-center gap-2">
+                      Your Category Programs
+                      <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium">Personal</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                      {filteredOwnCategoryPrograms.map((program) => {
+                        const isRegistered = program.participants.includes(id);
+                        return (
+                          <div
+                            key={program._id}
+                            className="group relative flex items-center gap-2.5 p-2.5 rounded-lg bg-indigo-100/30 backdrop-blur-md border border-indigo-200/50 hover:bg-indigo-200/40 hover:ring-1 hover:ring-indigo-300 hover:shadow-lg hover:scale-102 transition-all duration-200 cursor-pointer"
+                            onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                          >
+                            <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white">
+                              {getCategoryIcon(program.category)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors truncate">
+                                {program.name}
+                              </h3>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
+                                {(program.category || "general").replace(/\(.*\)/, "")}
+                              </p>
+                            </div>
+                            <div
+                              className={`w-9 h-4.5 rounded-full flex items-center transition-all duration-300 ${isRegistered ? "bg-emerald-500" : "bg-gray-300"
+                                }`}
+                            >
+                              <div
+                                className={`w-3.5 h-3.5 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${isRegistered ? "translate-x-5" : "translate-x-1"
+                                  }`}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                {filteredGeneralPrograms.length > 0 && (
+                  <div>
+                    <h4 className="text-base font-semibold text-blue-600 mb-2 flex items-center gap-2">
+                      General Programs
+                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">Common</span>
+                    </h4>
+                    <div className="mb-4">
+                      <h5 className="text-sm font-medium text-indigo-500 mb-1.5">General (Individual)</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                        {filteredGeneralPrograms
+                          .filter((p) => p.category?.toLowerCase() === "general(individual)")
+                          .map((program) => {
+                            const isRegistered = program.participants.includes(id);
+                            return (
+                              <div
+                                key={program._id}
+                                className="group relative flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-100/30 backdrop-blur-md border border-blue-200/50 hover:bg-blue-200/40 hover:ring-1 hover:ring-blue-300 hover:shadow-lg hover:scale-102 transition-all duration-200 cursor-pointer"
+                                onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                              >
+                                <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white">
+                                  {getCategoryIcon(program.category)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                                    {program.name}
+                                  </h3>
+                                  <p className="text-xs text-gray-500 uppercase tracking-wide truncate">General (Individual)</p>
+                                </div>
+                                <div
+                                  className={`w-9 h-4.5 rounded-full flex items-center transition-all duration-300 ${isRegistered ? "bg-emerald-500" : "bg-gray-300"
+                                    }`}
+                                >
+                                  <div
+                                    className={`w-3.5 h-3.5 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${isRegistered ? "translate-x-5" : "translate-x-1"
+                                      }`}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium text-indigo-500 mb-1.5">General (Group)</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                        {filteredGeneralPrograms
+                          .filter((p) => p.category?.toLowerCase() === "general(group)")
+                          .map((program) => {
+                            const isRegistered = program.participants.includes(id);
+                            return (
+                              <div
+                                key={program._id}
+                                className="group relative flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-100/30 backdrop-blur-md border border-blue-200/50 hover:bg-blue-200/40 hover:ring-1 hover:ring-blue-300 hover:shadow-lg hover:scale-102 transition-all duration-200 cursor-pointer"
+                                onClick={() => handleToggleProgram(program._id, isRegistered, program)}
+                              >
+                                <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white">
+                                  {getCategoryIcon(program.category)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                                    {program.name}
+                                  </h3>
+                                  <p className="text-xs text-gray-500 uppercase tracking-wide truncate">General (Group)</p>
+                                </div>
+                                <div
+                                  className={`w-9 h-4.5 rounded-full flex items-center transition-all duration-300 ${isRegistered ? "bg-emerald-500" : "bg-gray-300"
+                                    }`}
+                                >
+                                  <div
+                                    className={`w-3.5 h-3.5 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${isRegistered ? "translate-x-5" : "translate-x-1"
+                                      }`}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* <div>
             {filteredOwnCategoryPrograms.length === 0 && filteredGeneralPrograms.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -532,7 +670,7 @@ export default function ContestantDetailsPage() {
                 )}
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
@@ -1257,7 +1395,7 @@ export default function ContestantDetailsPage() {
 
 //     // Check general(individual) participants limit (max 4 per student)
 //     if (!isRegistered && programName.category === 'general(individual)') {
-//       const generalIndividualItems = allPrograms.filter(p => 
+//       const generalIndividualItems = allPrograms.filter(p =>
 //         p.category === 'general(individual)' && p.participants.includes(id)
 //       ).length;
 //       if (generalIndividualItems >= 4) {
@@ -1268,7 +1406,7 @@ export default function ContestantDetailsPage() {
 
 //     // Check general(group) participants limit (max 3 per group)
 //     if (!isRegistered && programName.category === 'general(group)') {
-//       const groupParticipants = allPrograms.filter(p => 
+//       const groupParticipants = allPrograms.filter(p =>
 //         p.category === 'general(group)' && p.participants.includes(id)
 //       ).length;
 //       if (groupParticipants >= 3) {
@@ -1367,10 +1505,10 @@ export default function ContestantDetailsPage() {
 //   }, {});
 
 //   const registeredCount = allPrograms.filter(p => p.participants.includes(id)).length;
-//   const generalIndividualCount = allPrograms.filter(p => 
+//   const generalIndividualCount = allPrograms.filter(p =>
 //     p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)
 //   ).length;
-//   const generalGroupCount = allPrograms.filter(p => 
+//   const generalGroupCount = allPrograms.filter(p =>
 //     p.category?.toLowerCase() === 'general(group)' && p.participants.includes(id)
 //   ).length;
 

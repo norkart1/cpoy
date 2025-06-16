@@ -195,11 +195,11 @@ export default function AddItem() {
           )}
           {/* Form Section */}
 
-          <div className="p-6 max-w-4xl mx-auto">
+          {/* <div className="p-6 max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">
-              {/* Contestants {groupName ? `in ${groupName}` : "List"} */}
+              Contestants {groupName ? `in ${groupName}` : "List"}
             </h1>
-          </div>
+          </div> */}
 
           <div>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -285,7 +285,7 @@ export default function AddItem() {
                         className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
                       >
                         <Edit3 className="w-4 h-4" />
-                        Manage
+                        View
                       </button>
 
                       {teamName === "admin" &&
