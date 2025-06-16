@@ -61,7 +61,7 @@ export default function ContestantRegistration() {
       setForm({
         contestantNumber: "",
         name: "",
-        groupName: "QudwathulUlama",
+        groupName: "QUDWATHULULAMA",
         category: "subjunior",
         file: null,
       });
@@ -109,7 +109,7 @@ export default function ContestantRegistration() {
                   setForm({
                     contestantNumber: "",
                     name: "",
-                    groupName: "Ma'abariyah",
+                    groupName: "QUDWATHULULAMA",
                     category: "subjunior",
                     file: null,
                   })
