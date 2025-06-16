@@ -15,12 +15,21 @@ import { signOut } from "next-auth/react";
 
 
 export default function AddItem() {
-
+const router = useRouter();
   const { data: session, status } = useSession();
 
-  if (!session || session.user.name !== "team1") {
-    redirect("/team-login");
-  }
+  const allowedTeams = ["QUDWATHULULAMA", "SUHBATHUSSADATH","NUSRATHULUMARA"];
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (!session || !allowedTeams.includes(session.user.name)) {
+      router.push("/team-login");
+    } else {
+      setTeamName(session.user.teamName || "");
+    }
+  }, [session, status, router]);
+
 
 
   const [formItems, setFormItems] = useState([]);
@@ -34,7 +43,6 @@ export default function AddItem() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState("all");
 
-  const router = useRouter();
 
   useEffect(() => {
     if (status === "loading") return; // Wait for session to load
