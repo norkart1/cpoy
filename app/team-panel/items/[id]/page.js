@@ -280,10 +280,9 @@
 // }
 
 
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { User, Trash2 } from "lucide-react";
 import UserSidebar from "@/components/userSidebar";
@@ -294,7 +293,7 @@ export default function ManageItemPage() {
   const [participants, setParticipants] = useState([]);
   const [message, setMessage] = useState(null);
 
-  const fetchParticipants = async () => {
+  const fetchParticipants = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/items/${itemId}/participants`);
       if (!res.ok) {
@@ -309,7 +308,7 @@ export default function ManageItemPage() {
       setParticipants([]);
       setMessage({ type: "error", text: "Server error fetching participants." });
     }
-  };
+  }, [itemId]);
 
   const deleteContestant = async (contestantId) => {
     if (!confirm("Are you sure you want to delete this contestant?")) return;
@@ -334,13 +333,12 @@ export default function ManageItemPage() {
     if (itemId) {
       fetchParticipants();
     }
-  }, [itemId]);
+  }, [itemId, fetchParticipants]);
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <UserSidebar />
       <main className="flex-1 p-6 md:p-10">
-        {/* Header Section */}
         <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
@@ -355,24 +353,27 @@ export default function ManageItemPage() {
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 py-8">
-          {/* Alert Message */}
           {message && (
             <div
-              className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${message.type === "success"
+              className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${
+                message.type === "success"
                   ? "bg-green-500/10 text-green-700 border border-green-200/50"
                   : "bg-red-500/10 text-red-700 border border-red-200/50"
-                }`}
+              }`}
               onClick={() => setMessage(null)}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${message.type === "success" ? "bg-green-500" : "bg-red-500"}`}></div>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    message.type === "success" ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></div>
                 <span className="font-medium">{message.text}</span>
                 <span className="text-sm opacity-70 ml-auto">Click to dismiss</span>
               </div>
             </div>
           )}
 
-          {/* Current Participants Section */}
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -399,13 +400,17 @@ export default function ManageItemPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {participant.name ? participant.name.split(" ").map((n) => n[0]).join("") : "N/A"}
+                          {participant.name
+                            ? participant.name.split(" ").map((n) => n[0]).join("")
+                            : "N/A"}
                         </div>
                         <div>
                           <h3 className="text-base font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
                             {participant.name || "Unknown"}
                           </h3>
-                          <p className="text-xs text-gray-500">#{participant.contestantNumber || "N/A"}</p>
+                          <p className="text-xs text-gray-500">
+                            #{participant.contestantNumber || "N/A"}
+                          </p>
                         </div>
                       </div>
                       <button
@@ -440,6 +445,166 @@ export default function ManageItemPage() {
     </div>
   );
 }
+
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { useParams } from "next/navigation";
+// import { User, Trash2 } from "lucide-react";
+// import UserSidebar from "@/components/userSidebar";
+
+// export default function ManageItemPage() {
+//   const params = useParams();
+//   const itemId = params.id;
+//   const [participants, setParticipants] = useState([]);
+//   const [message, setMessage] = useState(null);
+
+//   const fetchParticipants = async () => {
+//     try {
+//       const res = await fetch(`/api/admin/items/${itemId}/participants`);
+//       if (!res.ok) {
+//         setParticipants([]);
+//         setMessage({ type: "error", text: "Failed to fetch participants." });
+//         return;
+//       }
+//       const data = await res.json();
+//       setParticipants(data || []);
+//     } catch (err) {
+//       console.error("Failed to fetch participants:", err);
+//       setParticipants([]);
+//       setMessage({ type: "error", text: "Server error fetching participants." });
+//     }
+//   };
+
+//   const deleteContestant = async (contestantId) => {
+//     if (!confirm("Are you sure you want to delete this contestant?")) return;
+
+//     try {
+//       const res = await fetch(`/api/admin/items/${itemId}/participants/${contestantId}`, {
+//         method: "DELETE",
+//       });
+//       const result = await res.json();
+//       if (result.success) {
+//         setMessage({ type: "success", text: "Contestant deleted successfully." });
+//         fetchParticipants();
+//       } else {
+//         setMessage({ type: "error", text: result.message || "Failed to delete contestant." });
+//       }
+//     } catch (err) {
+//       setMessage({ type: "error", text: "Server error deleting contestant." });
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (itemId) {
+//       fetchParticipants();
+//     }
+//   }, [itemId]);
+
+//   return (
+//     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+//       <UserSidebar />
+//       <main className="flex-1 p-6 md:p-10">
+//         {/* Header Section */}
+//         <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
+//           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+//                   Manage Participants
+//                 </h1>
+//                 <p className="text-gray-600 mt-1">Competition ID: {itemId}</p>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         <div className="px-4 sm:px-6 lg:px-8 py-8">
+//           {/* Alert Message */}
+//           {message && (
+//             <div
+//               className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${message.type === "success"
+//                   ? "bg-green-500/10 text-green-700 border border-green-200/50"
+//                   : "bg-red-500/10 text-red-700 border border-red-200/50"
+//                 }`}
+//               onClick={() => setMessage(null)}
+//             >
+//               <div className="flex items-center gap-3">
+//                 <div className={`w-2 h-2 rounded-full ${message.type === "success" ? "bg-green-500" : "bg-red-500"}`}></div>
+//                 <span className="font-medium">{message.text}</span>
+//                 <span className="text-sm opacity-70 ml-auto">Click to dismiss</span>
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Current Participants Section */}
+//           <div>
+//             <div className="flex items-center justify-between mb-6">
+//               <div>
+//                 <h2 className="text-xl font-semibold text-gray-800">Current Participants</h2>
+//                 <p className="text-sm text-gray-500">{participants.length} participants</p>
+//               </div>
+//             </div>
+
+//             {participants.length === 0 ? (
+//               <div className="text-center py-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
+//                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+//                   <User className="w-8 h-8 text-indigo-500" />
+//                 </div>
+//                 <h3 className="text-lg font-medium text-gray-800 mb-1">No Participants</h3>
+//                 <p className="text-sm text-gray-500">No contestants have been added to this competition.</p>
+//               </div>
+//             ) : (
+//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+//                 {participants.map((participant) => (
+//                   <div
+//                     key={participant._id}
+//                     className="group bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-gray-100 hover:shadow-lg hover:bg-indigo-50/50 transition-all duration-200"
+//                   >
+//                     <div className="flex items-center justify-between">
+//                       <div className="flex items-center gap-3">
+//                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+//                           {participant.name ? participant.name.split(" ").map((n) => n[0]).join("") : "N/A"}
+//                         </div>
+//                         <div>
+//                           <h3 className="text-base font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
+//                             {participant.name || "Unknown"}
+//                           </h3>
+//                           <p className="text-xs text-gray-500">#{participant.contestantNumber || "N/A"}</p>
+//                         </div>
+//                       </div>
+//                       <button
+//                         onClick={() => deleteContestant(participant._id)}
+//                         className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+//                         title="Delete Contestant"
+//                       >
+//                         <Trash2 className="w-4 h-4" />
+//                       </button>
+//                     </div>
+//                     {(participant.score || participant.badge) && (
+//                       <div className="flex items-center gap-2 mt-2">
+//                         {participant.score && (
+//                           <span className="px-2 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">
+//                             Score: {participant.score}
+//                           </span>
+//                         )}
+//                         {participant.badge && (
+//                           <span className="px-2 py-0.5 bg-green-100 text-green-600 rounded-full text-xs font-medium">
+//                             {participant.badge}
+//                           </span>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
 
 // "use client";
 

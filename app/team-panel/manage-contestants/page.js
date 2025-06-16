@@ -320,7 +320,7 @@ export default function ContestantsPage() {
                         Showing <span className="font-medium text-indigo-600">{filteredContestants.length}</span> of{' '}
                         <span className="font-medium">{contestants.length}</span> contestants
                         {searchTerm && (
-                            <span> matching "<span className="font-medium text-indigo-600">{searchTerm}</span>"</span>
+                            <span> matching <span className="font-medium text-indigo-600">{searchTerm}</span></span>
                         )}
                     </div>
                 )}

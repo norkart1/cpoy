@@ -1,9 +1,15 @@
-import { connectDB } from '@/lib/dbConnect';
+import { NextResponse } from 'next/server'; // Updated to NextResponse
+import connectToDatabase from '@/lib/dbConnect'; // Fixed import
 import Item from '@/models/Item';
 import Jury from '@/models/Jury';
 
 export async function POST(req) {
-  await connectDB();
+  try {
+    await connectToDatabase(); // Use connectToDatabase
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json({ success: false, message: 'Database connection failed.' }, { status: 500 });
+  }
 
   try {
     const body = await req.json();
@@ -11,12 +17,12 @@ export async function POST(req) {
 
     const item = await Item.findById(itemId);
     if (!item) {
-      return Response.json({ success: false, message: 'Item not found.' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'Item not found.' }, { status: 404 });
     }
 
     const jury = await Jury.findById(juryId);
     if (!jury) {
-      return Response.json({ success: false, message: 'Jury not found.' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'Jury not found.' }, { status: 404 });
     }
 
     // Remove previous item from jury
@@ -35,9 +41,9 @@ export async function POST(req) {
     jury.assignedItems.push(itemId);
     await jury.save();
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Assign Jury Error:", error);
-    return Response.json({ success: false, message: 'Error assigning jury.' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Error assigning jury.' }, { status: 500 });
   }
 }
