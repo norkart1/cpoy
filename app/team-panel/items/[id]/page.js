@@ -293,22 +293,58 @@ export default function ManageItemPage() {
   const [participants, setParticipants] = useState([]);
   const [message, setMessage] = useState(null);
 
+  // const fetchParticipants = useCallback(async () => {
+  //   try {
+  //     const res = await fetch(`/api/admin/items/${itemId}/participants`);
+  //     if (!res.ok) {
+  //       setParticipants([]);
+  //       setMessage({ type: "error", text: "Failed to fetch participants." });
+  //       return;
+  //     }
+  //     const data = await res.json();
+  //     setParticipants(data || []);
+  //   } catch (err) {
+  //     console.error("Failed to fetch participants:", err);
+  //     setParticipants([]);
+  //     setMessage({ type: "error", text: "Server error fetching participants." });
+  //   }
+  // }, [itemId]);
   const fetchParticipants = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/admin/items/${itemId}/participants`);
-      if (!res.ok) {
-        setParticipants([]);
-        setMessage({ type: "error", text: "Failed to fetch participants." });
-        return;
-      }
-      const data = await res.json();
-      setParticipants(data || []);
-    } catch (err) {
-      console.error("Failed to fetch participants:", err);
+  try {
+    console.log("Fetching participants for item:", itemId);
+
+    const res = await fetch(`/api/admin/items/${itemId}/participants`);
+    console.log("Response status:", res.status);
+
+    if (!res.ok) {
+      console.error("Failed to fetch participants. Response not OK.");
       setParticipants([]);
-      setMessage({ type: "error", text: "Server error fetching participants." });
+      setMessage({ type: "error", text: "Failed to fetch participants." });
+      return;
     }
-  }, [itemId]);
+
+    const data = await res.json();
+    console.log("Raw data received:", data);
+
+    // Check if it's an array or object
+    if (Array.isArray(data)) {
+      console.log("Data is an array. Setting as participants.");
+      setParticipants(data);
+    } else if (Array.isArray(data.participants)) {
+      console.log("Data has 'participants' array. Setting it.");
+      setParticipants(data.participants);
+    } else {
+      console.warn("Data format unexpected. Defaulting to empty array.");
+      setParticipants([]);
+    }
+
+  } catch (err) {
+    console.error("Exception while fetching participants:", err);
+    setParticipants([]);
+    setMessage({ type: "error", text: "Server error fetching participants." });
+  }
+}, [itemId]);
+
 
   const deleteContestant = async (contestantId) => {
     if (!confirm("Are you sure you want to delete this contestant?")) return;
