@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Plus, Trash2, Share2, Edit3, Users, Award, Calendar, Tag } from "lucide-react";
+import { Plus, Trash2, Share2, Edit3, Users, Award, Calendar, Tag, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AdminSidebar from '@/components/adminSidebar';
 export default function AddItem() {
@@ -152,7 +152,7 @@ export default function AddItem() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <AdminSidebar />
-      <main className='flex-1 p-6 md:p-10'>
+      <main className='flex-1'>
       {/* Header Section */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
         <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -327,13 +327,13 @@ export default function AddItem() {
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    {/* <button
+                    <button
                       onClick={() => router.push(`/admin/items/${item._id}`)}
                       className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
                     >
-                      <Edit3 className="w-4 h-4" />
-                      Manage
-                    </button> */}
+                      <Eye className="w-4 h-4" />
+                      VIEW
+                    </button>
 
                     <div className="flex items-center gap-2">
                       <button

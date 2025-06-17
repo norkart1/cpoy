@@ -3,7 +3,8 @@
 // eslint-disable react/no-unescaped-entities
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Trash2, User, Users, FileText } from "lucide-react";
+import { Plus, Trash2, User, Users, FileText, Eye } from "lucide-react";
+import Link from "next/link";
 import AdminSidebar from '@/components/adminSidebar';
 
 export default function ContestantRegistration() {
@@ -93,7 +94,7 @@ export default function ContestantRegistration() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <AdminSidebar />
-      <main className='flex-1 p-6 md:p-10'>
+      <main className='flex-1'>
         {/* Header Section */}
         <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
           <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -290,7 +291,16 @@ export default function ContestantRegistration() {
                             {contestant.category || "Not specified"}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-4 text-right flex justify-end gap-4">
+                          <Link href={`/admin/hallticket/${contestant._id}`}>
+                            <button
+                              className="text-indigo-600 hover:text-indigo-800 hover:scale-110 transition-all"
+                              title="View Hall Ticket"
+                            >
+                              <Eye className="w-4 h-4 inline" />
+                            </button>
+                          </Link>
+
                           <button
                             onClick={() => handleDelete(contestant._id)}
                             className="text-red-600 hover:text-red-800 hover:scale-110 transition-all"

@@ -222,13 +222,15 @@ import { useState } from "react";
 import { Menu, X, Home, Users, Activity, FileText, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
+
 
 const menuItems = [
   { label: "Dashboard", href: "/team-panel", icon: Home },
   { label: "Team Members", href: "/team-panel/manage-contestants", icon: Users },
-  { label: "Submit Programs", href: "/team-panel/add-item", icon: Activity },
-  { label: "Program Status", href: "/team-panel/programs", icon: FileText },
-  { label: "Results", href: "/team-panel/results", icon: FileText },
+  // { label: "Submit Programs", href: "/team-panel/add-item", icon: Activity },
+  // { label: "Program Status", href: "/team-panel/programs", icon: FileText },
+  // { label: "Results", href: "/team-panel/results", icon: FileText },
 ];
 
 export default function UserSidebar() {
@@ -249,10 +251,11 @@ export default function UserSidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } lg:relative lg:translate-x-0 lg:shadow-lg`}
+        className={`fixed top-0 left-0 w-64 z-40 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform overflow-y-auto
+    ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} lg:relative lg:shadow-lg`}
       >
+
+
         {/* Close button (mobile only) */}
         <button
           onClick={() => setIsOpen(false)}
@@ -285,11 +288,10 @@ export default function UserSidebar() {
               <li key={index}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-                    isActive(item.href)
-                      ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
-                      : "text-indigo-100 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
+                    ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
+                    : "text-indigo-100 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   <span className="inline-flex items-center justify-center text-lg w-8 h-8 rounded-md bg-white/10 text-white group-hover:bg-white/20">
                     <item.icon size={20} />
@@ -300,8 +302,21 @@ export default function UserSidebar() {
                   )}
                 </Link>
               </li>
+
             ))}
           </ul>
+          <li>
+            <button
+              onClick={() => signOut({ callbackUrl: "/team-login" })}
+              className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-indigo-100 hover:bg-white/10 hover:text-white"
+            >
+              <span className="inline-flex items-center justify-center text-lg w-8 h-8 rounded-md bg-white/10 text-white group-hover:bg-white/20">
+                <User size={20} />
+              </span>
+              <span className="text-[16px] tracking-wide">Logout</span>
+            </button>
+          </li>
+
         </nav>
 
         {/* User Profile */}

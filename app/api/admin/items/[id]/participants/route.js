@@ -23,7 +23,11 @@ export async function GET(request, { params }) {
       return NextResponse.json({ success: false, message: 'Item not found' }, { status: 404 });
     }
 
-    return NextResponse.json(item.participants || []);
+    return NextResponse.json({
+      itemName: item.name,
+      participants: item.participants || [],
+    });
+
   } catch (error) {
     console.error('Error fetching participants:', error);
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
