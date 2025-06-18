@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const contestantSchema = new mongoose.Schema({
   contestantNumber: { type: String, unique: true },
