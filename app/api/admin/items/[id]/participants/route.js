@@ -78,11 +78,18 @@
 //   }
 // }
 
+
+
+
+
 import dbConnect from '@/lib/dbConnect';
 import Item from '@/models/Item';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+
+// ✅ Add this line to ensure Vercel knows this is a dynamic route
+export const dynamic = 'force-dynamic';
 
 export async function GET(request, context) {
   const params = await context.params; // ✅ await it to prevent warning
@@ -115,3 +122,41 @@ export async function GET(request, context) {
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
 }
+
+// import dbConnect from '@/lib/dbConnect';
+// import Item from '@/models/Item';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '@/lib/auth';
+// import { NextResponse } from 'next/server';
+
+// export async function GET(request, context) {
+//   const params = await context.params; // ✅ await it to prevent warning
+//   const { id } = params;
+
+//   const session = await getServerSession(authOptions);
+//   if (!session || !session.user?.teamName) {
+//     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+//   }
+
+//   await dbConnect();
+
+//   try {
+//     const item = await Item.findById(id).populate({
+//       path: 'participants',
+//       match: { groupName: session.user.teamName },
+//     });
+
+//     if (!item) {
+//       return NextResponse.json({ success: false, message: 'Item not found' }, { status: 404 });
+//     }
+
+//     return NextResponse.json({
+//       itemName: item.name,
+//       participants: item.participants || [],
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching participants:', error);
+//     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+//   }
+// }
