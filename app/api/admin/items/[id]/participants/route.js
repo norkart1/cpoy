@@ -33,26 +33,64 @@
 //     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
 //   }
 // }
+// import dbConnect from '@/lib/dbConnect';
+// import Item from '@/models/Item';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '@/lib/auth';
+// import { NextResponse } from 'next/server';
+
+// export async function GET(request, { params }) {
+//   const session = await getServerSession(authOptions);
+//   console.log("Session:", session);
+
+//   // Use `teamName` because your session has it instead of `groupName`
+//   if (!session || !session.user?.teamName) {
+//     console.error("Unauthorized: Missing session or teamName");
+//     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+//   }
+
+//   const { id } = params;
+
+//   if (!id) {
+//     return NextResponse.json({ success: false, message: 'Missing itemId' }, { status: 400 });
+//   }
+
+//   await dbConnect();
+
+//   try {
+//     const item = await Item.findById(id).populate({
+//       path: 'participants',
+//       match: { groupName: session.user.teamName }, // Match against teamName from session
+//     });
+
+//     if (!item) {
+//       return NextResponse.json({ success: false, message: 'Item not found' }, { status: 404 });
+//     }
+
+//     return NextResponse.json({
+//       itemName: item.name,
+//       participants: item.participants || [],
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching participants:', error);
+//     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+//   }
+// }
+
 import dbConnect from '@/lib/dbConnect';
 import Item from '@/models/Item';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-export async function GET(request, { params }) {
-  const session = await getServerSession(authOptions);
-  console.log("Session:", session);
-
-  // Use `teamName` because your session has it instead of `groupName`
-  if (!session || !session.user?.teamName) {
-    console.error("Unauthorized: Missing session or teamName");
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-  }
-
+export async function GET(request, context) {
+  const params = await context.params; // ✅ await it to prevent warning
   const { id } = params;
 
-  if (!id) {
-    return NextResponse.json({ success: false, message: 'Missing itemId' }, { status: 400 });
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.teamName) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
   }
 
   await dbConnect();
@@ -60,7 +98,7 @@ export async function GET(request, { params }) {
   try {
     const item = await Item.findById(id).populate({
       path: 'participants',
-      match: { groupName: session.user.teamName }, // Match against teamName from session
+      match: { groupName: session.user.teamName },
     });
 
     if (!item) {
