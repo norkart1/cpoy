@@ -313,7 +313,7 @@ export default function ManageItemPage() {
   try {
     console.log("Fetching participants for item:", itemId);
 
-    const res = await fetch(`/api/admin/items/${itemId}/participants`);
+    const res = await fetch(`/api/team/item/${itemId}/participants`);
     console.log("Response status:", res.status);
 
     if (!res.ok) {
