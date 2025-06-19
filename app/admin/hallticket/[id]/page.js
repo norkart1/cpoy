@@ -3,9 +3,88 @@
 // import { useEffect, useState } from "react";
 // import axios from "axios";
 
+// // Enhanced QR Code component with better styling
+// const QrCodePlaceholder = () => (
+//   <svg
+//     className="w-32 h-32 border border-gray-300 rounded-sm"
+//     viewBox="0 0 100 100"
+//     xmlns="http://www.w3.org/2000/svg"
+//     fill="black"
+//   >
+//     <path d="M0 0h30v30H0z M10 10h10v10H10z M70 0h30v30H70z M80 10h10v10H80z M0 70h30v30H0z M10 80h10v10H10z M70 70h30v30H70z M40 40h20v20H40z M90 45h10v10H90z M45 90h10v10H45z M90 90h10v10H90z M70 40h10v10H70z M40 70h10v10H40z M30 45h10v10H30z M45 30h10v10H45z" />
+//     <path d="M40,0 L40,10 L50,10 L50,20 L60,20 L60,10 L70,10 L70,0 L60,0 L60,10 L50,10 L50,0 L40,0 Z" />
+//     <path d="M0,40 L10,40 L10,50 L20,50 L20,60 L10,60 L10,70 L0,70 L0,60 L10,60 L10,50 L0,50 L0,40 Z" />
+//     <path d="M90,40 L100,40 L100,50 L90,50 L90,60 L80,60 L80,70 L70,70 L70,80 L80,80 L80,90 L90,90 L90,100 L100,100 L100,90 L90,90 L90,80 L100,80 L100,70 L90,70 L90,60 L100,60 L100,50 L90,50 L90,40 Z" />
+//     <path d="M60,60 L70,60 L70,70 L60,70 L60,60 Z" />
+//     <path d="M40,60 L50,60 L50,70 L40,70 L40,60 Z" />
+//   </svg>
+// );
+
+// // Enhanced Program Section with modern black-and-white UI
+// const ProgramSection = ({ date, programs }) => {
+//   // Format date as DD - MM - YYYY
+//   const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+//     day: '2-digit',
+//     month: '2-digit',
+//     year: 'numeric',
+//   }).replace(/\//g, ' - ');
+
+//   // Get Malayalam day name
+//   const malayalamDays = ['ഞായർ', 'തിങ്കൾ', 'ചൊവ്വ', 'ബുധൻ', 'വ്യാഴം', 'വെള്ളി', 'ശനി'];
+//   const dayIndex = new Date(date).getDay();
+//   const malayalamDay = malayalamDays[dayIndex];
+
+//   return (
+//     <div className="mx-12 bg-gradient-to-b from-gray-100 to-white rounded-lg">
+//       {/* Top Bar Date: Compact badge style, not full-width */}
+//       <div className="flex justify-center py-4">
+//         <span className="bg-black text-white text-center py-2 px-4 text-base font-medium tracking-wide rounded-full">
+//           {formattedDate} {malayalamDay}
+//         </span>
+//       </div>
+
+//       {/* Competitions Table */}
+//       <div className="flex flex-col min-h-[18rem] p-2">
+//         {/* Table Body */}
+//         <div className="flex-grow text-black">
+//           {programs && programs.length > 0 ? (
+//             programs.map((p, i) => (
+//               <div
+//                 key={i}
+//                 className="flex bg-white border border-gray-200 rounded mb-2 hover:bg-gray-50 transition-colors duration-150 print:page-break-inside-avoid"
+//               >
+//                 <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+//                   {p.timeRange?.start && p.timeRange?.end ? `${p.timeRange.start} - ${p.timeRange.end}` : 'TBA'}
+//                 </div>
+//                 <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+//                   {p.stage === 'stage' ? 'Stage' : 'Non-Stage'}
+//                 </div>
+//                 <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+//                   {p.category || 'Unknown'}
+//                 </div>
+//                 <div className="w-1/4 p-2 text-center font-semibold text-black">
+//                   {p.name}
+//                 </div>
+//               </div>
+//             ))
+//           ) : (
+//             <div className="flex items-center justify-center h-full text-gray-500 p-4">
+//               <div className="text-center">
+//                 <div className="text-lg font-medium mb-2">No competitions assigned</div>
+//                 <div className="text-sm text-gray-400">Programs will appear here when available</div>
+//               </div>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
 // export default function HallTicket() {
-//   const { id } = useParams(); // ✅ useParams for App Router
+//   const { id } = useParams();
 //   const [data, setData] = useState(null);
+//   const [loading, setLoading] = useState(true);
 
 //   useEffect(() => {
 //     if (!id) return;
@@ -15,104 +94,369 @@
 //         setData(res.data);
 //       } catch (error) {
 //         console.error("Error fetching hall ticket:", error);
+//       } finally {
+//         setLoading(false);
 //       }
 //     };
 //     fetchData();
 //   }, [id]);
 
+//   // Enhanced loading state
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen bg-gray-50">
+//         <div className="text-center p-8">
+//           <div className="w-12 h-12 border-3 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+//           <div className="text-xl font-semibold text-black mb-2">Loading Hall Ticket</div>
+//           <div className="text-gray-600">Please wait...</div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Enhanced error state
 //   if (!data) {
-//     return <div className="text-center py-20 text-gray-600">Loading...</div>;
+//     return (
+//       <div className="flex items-center justify-center min-h-screen bg-gray-50">
+//         <div className="text-center p-8 bg-white border-2 border-black shadow-lg max-w-md">
+//           <div className="text-xl font-semibold text-black mb-2">Hall Ticket Not Found</div>
+//           <div className="text-gray-600">Please check your ticket ID and try again</div>
+//         </div>
+//       </div>
+//     );
 //   }
 
 //   const { contestant, programs } = data;
 
-//   return (
-//     <div className="max-w-3xl mx-auto my-12 p-8 bg-white shadow-xl rounded-3xl border border-gray-200 print:border-0">
-//       <h1 className="text-3xl font-bold text-center text-indigo-700 mb-4">Fest Hall Ticket</h1>
+//   // Group programs by date, handling invalid dates
+//   const programsByDate = programs.reduce((acc, program) => {
+//     // Validate program.date
+//     if (!program.date || isNaN(new Date(program.date).getTime())) {
+//       console.warn('Invalid date found in program:', program);
+//       return acc; // Skip programs with invalid dates
+//     }
+//     const programDate = new Date(program.date).toISOString().split('T')[0];
+//     if (!acc[programDate]) {
+//       acc[programDate] = [];
+//     }
+//     acc[programDate].push(program);
+//     return acc;
+//   }, {});
 
-//       <div className="text-gray-700 space-y-2 mb-6">
-//         <p><strong>Name:</strong> {contestant.name}</p>
-//         <p><strong>Contestant Number:</strong> #{contestant.contestantNumber}</p>
-//         <p><strong>Group:</strong> {contestant.groupName}</p>
-//         <p><strong>Category:</strong> {contestant.category}</p>
+//   // Main date for display
+//   const mainDate = '2025-06-21';
+
+//   // Filter programs for main date
+//   const mainPrograms = programsByDate[mainDate] || [];
+
+//   // Other dates excluding main date
+//   const otherDates = Object.keys(programsByDate)
+//     .filter((date) => date !== mainDate)
+//     .sort(); // Sort dates chronologically
+
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 print:bg-white print:p-0">
+//       <div className="w-full max-w-4xl bg-white shadow-lg print:shadow-none border border-gray-200 print:border-none">
+//         {/* First Page with enhanced styling */}
+//         <div className="pt-4 print:page mb-6">
+//           {/* Header Section with better spacing */}
+//           <div className="mb-2">
+//             <img
+//               src="/header-01.png"
+//               alt="Alathurpadi Dars Fest Header"
+//               className="w-full h-auto rounded-sm"
+//               onError={(e) => {
+//                 e.target.style.display = "none";
+//                 e.target.nextSibling.style.display = "block";
+//               }}
+//             />
+//             <div
+//               style={{
+//                 display: "none",
+//                 border: "2px dashed #9CA3AF",
+//                 padding: "2rem",
+//                 textAlign: "center",
+//                 fontSize: "1rem",
+//                 color: "#6B7280",
+//                 backgroundColor: "#F9FAFB",
+//                 borderRadius: "4px",
+//               }}
+//             >
+//               Header image placeholder
+//             </div>
+//           </div>
+
+//           {/* Enhanced Title Banner */}
+//           <div className="mx-12 border-2 border-black shadow-sm">
+//             <div className="bg-black text-white text-center py-3 text-xl font-bold tracking-wider">
+//               HALL TICKET FOR NON STAGE
+//             </div>
+
+//             {/* Main Details Section with improved layout */}
+//             <div className="flex bg-white">
+//               <div className="w-2/3 flex items-center justify-center border-r-2 border-black py-2">
+//                 <span className="text-[200px] md:text-[200px] font-black text-black tracking-tighter leading-none">
+//                   {contestant.contestantNumber}
+//                 </span>
+//               </div>
+//               <div className="w-1/3 flex flex-col items-center justify-center space-y-2">
+//                 <div className="text-center">
+//                   <p className="text-sm font-semibold text-black mb-1">Fest Updates Here</p>
+//                   <p className="text-xs text-gray-600 mb-4">Scan Me!</p>
+//                 </div>
+//                 <QrCodePlaceholder />
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Programs Section for Main Date */}
+//           <div className="">
+//             <ProgramSection date={mainDate} programs={mainPrograms} />
+//           </div>
+
+//           {/* Programs Sections for Other Dates */}
+//           {otherDates.map((date) => (
+//             <div key={date} className="">
+//               <ProgramSection date={date} programs={programsByDate[date]} />
+//             </div>
+//           ))}
+//         </div>
 //       </div>
 
-//       <h2 className="text-xl font-semibold text-purple-700 mb-2">Participated Programs</h2>
-//       <ul className="list-disc list-inside space-y-1">
-//         {programs && programs.length > 0 ? (
-//           programs.map((p, i) => (
-//             <li key={i}>
-//               <span className="font-medium">{p.name}</span> – {p.category}
-//             </li>
-//           ))
-//         ) : (
-//           <li className="text-gray-500">No programs assigned</li>
-//         )}
-//       </ul>
-
-//       <div className="mt-8 text-center">
-//         <button onClick={() => window.print()} className="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition">
-//           Print Hall Ticket
+//       {/* Enhanced Print Button */}
+//       <div className="mt-8 text-center print:hidden">
+//         <button
+//           onClick={() => window.print()}
+//           className="bg-black text-white px-10 py-4 font-semibold hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 tracking-wide"
+//         >
+//           🖨️ PRINT HALL TICKET
 //         </button>
 //       </div>
+
+//       {/* Enhanced Print-specific styles for exact web-to-PDF matching */}
+//       <style jsx>{`
+//         @media print {
+//           @page {
+//             size: A4;
+//             margin: 0.5cm;
+//           }
+
+//           * {
+//             -webkit-print-color-adjust: exact !important;
+//             color-adjust: exact !important;
+//             print-color-adjust: exact !important;
+//           }
+
+//           body {
+//             background: white !important;
+//             font-family: system-ui, -apple-system, sans-serif !important;
+//           }
+
+//           .print\\:bg-white {
+//             background-color: white !important;
+//           }
+
+//           .print\\:p-0 {
+//             padding: 0 !important;
+//           }
+
+//           .print\\:shadow-none {
+//             box-shadow: none !important;
+//           }
+
+//           .print\\:border-none {
+//             border: none !important;
+//           }
+
+//           .print\\:hidden {
+//             display: none !important;
+//           }
+
+//           .print\\:page {
+//             page-break-after: always;
+//           }
+
+//           .print\\:page-break-inside-avoid {
+//             page-break-inside: avoid !important;
+//           }
+
+//           /* Force exact colors for PDF */
+//           .bg-black {
+//             background-color: #000000 !important;
+//             -webkit-print-color-adjust: exact !important;
+//           }
+
+//           .text-white {
+//             color: #ffffff !important;
+//             -webkit-print-color-adjust: exact !important;
+//           }
+
+//           .text-black {
+//             color: #000000 !important;
+//           }
+
+//           .border-black {
+//             border-color: #000000 !important;
+//           }
+
+//           .bg-gray-100 {
+//             background-color: #f3f4f6 !important;
+//             -webkit-print-color-adjust: exact !important;
+//           }
+
+//           .bg-white {
+//             background-color: #ffffff !important;
+//             -webkit-print-color-adjust: exact !important;
+//           }
+
+//           .border-gray-200 {
+//             border-color: #e5e7eb !important;
+//           }
+
+//           .border-gray-300 {
+//             border-color: #d1d5db !important;
+//           }
+
+//           .border-gray-400 {
+//             border-color: #9ca3af !important;
+//           }
+
+//           .text-gray-600 {
+//             color: #4b5563 !important;
+//           }
+
+//           .text-gray-500 {
+//             color: #6b7280 !important;
+//           }
+
+//           .text-gray-400 {
+//             color: #9ca3af !important;
+//           }
+
+//           /* Ensure shadows are removed in print */
+//           .shadow-sm,
+//           .shadow-lg {
+//             box-shadow: none !important;
+//           }
+
+//           /* Fix font sizes for print */
+//           .text-8xl {
+//             font-size: 6rem !important;
+//             line-height: 1 !important;
+//           }
+
+//           .text-9xl {
+//             font-size: 8rem !important;
+//             line-height: 1 !important;
+//           }
+
+//           /* Ensure proper spacing in print */
+//           .min-h-screen {
+//             min-height: auto !important;
+//           }
+
+//           /* Force table borders to show */
+//           .border-2 {
+//             border-width: 2px !important;
+//             border-style: solid !important;
+//           }
+
+//           .border {
+//             border-width: 1px !important;
+//             border-style: solid !important;
+//           }
+
+//           .border-r {
+//             border-right-width: 1px !important;
+//             border-right-style: solid !important;
+//           }
+
+//           .border-b {
+//             border-bottom-width: 1px !important;
+//             border-bottom-style: solid !important;
+//           }
+
+//           .border-b-2 {
+//             border-bottom-width: 2px !important;
+//             border-bottom-style: solid !important;
+//           }
+
+//           .border-r-2 {
+//             border-right-width: 2px !important;
+//             border-right-style: solid !important;
+//           }
+//         }
+
+//         /* Better responsive font sizing */
+//         @media (max-width: 768px) {
+//           .text-8xl {
+//             font-size: 4rem;
+//           }
+//           .text-9xl {
+//             font-size: 5rem;
+//           }
+//         }
+
+//         @media (max-width: 640px) {
+//           .text-8xl {
+//             font-size: 3rem;
+//           }
+//           .text-9xl {
+//             font-size: 4rem;
+//           }
+//         }
+//       `}</style>
 //     </div>
 //   );
 // }
-
-
-
-
-
 
 
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useQRCode } from "next-qrcode"; // Revert to static import
 
-// Enhanced QR Code component with better styling
-const QrCodePlaceholder = () => (
-  <svg
-    className="w-32 h-32 border border-gray-300 rounded-sm"
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="black"
-  >
-    <path d="M0 0h30v30H0z M10 10h10v10H10z M70 0h30v30H70z M80 10h10v10H80z M0 70h30v30H0z M10 80h10v10H10z M70 70h30v30H70z M40 40h20v20H40z M90 45h10v10H90z M45 90h10v10H45z M90 90h10v10H90z M70 40h10v10H70z M40 70h10v10H40z M30 45h10v10H30z M45 30h10v10H45z" />
-    <path d="M40,0 L40,10 L50,10 L50,20 L60,20 L60,10 L70,10 L70,0 L60,0 L60,10 L50,10 L50,0 L40,0 Z" />
-    <path d="M0,40 L10,40 L10,50 L20,50 L20,60 L10,60 L10,70 L0,70 L0,60 L10,60 L10,50 L0,50 L0,40 Z" />
-    <path d="M90,40 L100,40 L100,50 L90,50 L90,60 L80,60 L80,70 L70,70 L70,80 L80,80 L80,90 L90,90 L90,100 L100,100 L100,90 L90,90 L90,80 L100,80 L100,70 L90,70 L90,60 L100,60 L100,50 L90,50 L90,40 Z" />
-    <path d="M60,60 L70,60 L70,70 L60,70 L60,60 Z" />
-    <path d="M40,60 L50,60 L50,70 L40,70 L40,60 Z" />
-  </svg>
-);
 
-// Enhanced Program Section with modern black-and-white UI
+// QR Code component
+// QR Code component
+const QrCode = ({ contestantNumber }) => {
+  const { Canvas } = useQRCode();
+  return (
+    <div className="w-32 h-32 border border-gray-300 rounded-sm p-2 bg-white">
+      <Canvas
+        text={`https://fest-automation.vercel.app/scan/${contestantNumber}`}
+        options={{
+          level: "H",
+          margin: 0,
+          scale: 4,
+          width: 112,
+        }}
+      />
+    </div>
+  );
+};
+
+// Program Section
 const ProgramSection = ({ date, programs }) => {
-  // Format date as DD - MM - YYYY
   const formattedDate = new Date(date).toLocaleDateString('en-GB', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   }).replace(/\//g, ' - ');
 
-  // Get Malayalam day name
   const malayalamDays = ['ഞായർ', 'തിങ്കൾ', 'ചൊവ്വ', 'ബുധൻ', 'വ്യാഴം', 'വെള്ളി', 'ശനി'];
   const dayIndex = new Date(date).getDay();
   const malayalamDay = malayalamDays[dayIndex];
 
   return (
     <div className="mx-12 bg-gradient-to-b from-gray-100 to-white rounded-lg">
-      {/* Top Bar Date: Compact badge style, not full-width */}
       <div className="flex justify-center py-4">
         <span className="bg-black text-white text-center py-2 px-4 text-base font-medium tracking-wide rounded-full">
           {formattedDate} {malayalamDay}
         </span>
       </div>
-
-      {/* Competitions Table */}
       <div className="flex flex-col min-h-[18rem] p-2">
-        {/* Table Body */}
         <div className="flex-grow text-black">
           {programs && programs.length > 0 ? (
             programs.map((p, i) => (
@@ -158,6 +502,7 @@ export default function HallTicket() {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/api/admin/hallticket/${id}`);
+        console.log('HallTicket API Response:', res.data);
         setData(res.data);
       } catch (error) {
         console.error("Error fetching hall ticket:", error);
@@ -168,7 +513,6 @@ export default function HallTicket() {
     fetchData();
   }, [id]);
 
-  // Enhanced loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -181,7 +525,6 @@ export default function HallTicket() {
     );
   }
 
-  // Enhanced error state
   if (!data) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -195,12 +538,10 @@ export default function HallTicket() {
 
   const { contestant, programs } = data;
 
-  // Group programs by date, handling invalid dates
   const programsByDate = programs.reduce((acc, program) => {
-    // Validate program.date
     if (!program.date || isNaN(new Date(program.date).getTime())) {
       console.warn('Invalid date found in program:', program);
-      return acc; // Skip programs with invalid dates
+      return acc;
     }
     const programDate = new Date(program.date).toISOString().split('T')[0];
     if (!acc[programDate]) {
@@ -210,23 +551,16 @@ export default function HallTicket() {
     return acc;
   }, {});
 
-  // Main date for display
   const mainDate = '2025-06-21';
-
-  // Filter programs for main date
   const mainPrograms = programsByDate[mainDate] || [];
-
-  // Other dates excluding main date
   const otherDates = Object.keys(programsByDate)
     .filter((date) => date !== mainDate)
-    .sort(); // Sort dates chronologically
+    .sort();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 print:bg-white print:p-0">
       <div className="w-full max-w-4xl bg-white shadow-lg print:shadow-none border border-gray-200 print:border-none">
-        {/* First Page with enhanced styling */}
         <div className="pt-4 print:page mb-6">
-          {/* Header Section with better spacing */}
           <div className="mb-2">
             <img
               src="/header-01.png"
@@ -253,13 +587,10 @@ export default function HallTicket() {
             </div>
           </div>
 
-          {/* Enhanced Title Banner */}
           <div className="mx-12 border-2 border-black shadow-sm">
             <div className="bg-black text-white text-center py-3 text-xl font-bold tracking-wider">
               HALL TICKET FOR NON STAGE
             </div>
-
-            {/* Main Details Section with improved layout */}
             <div className="flex bg-white">
               <div className="w-2/3 flex items-center justify-center border-r-2 border-black py-2">
                 <span className="text-[200px] md:text-[200px] font-black text-black tracking-tighter leading-none">
@@ -268,20 +599,18 @@ export default function HallTicket() {
               </div>
               <div className="w-1/3 flex flex-col items-center justify-center space-y-2">
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-black mb-1">Fest Updates Here</p>
-                  <p className="text-xs text-gray-600 mb-4">Scan Me!</p>
+                  <p className="text-sm font-semibold text-black mb-1">Scan for Events</p>
+                  <p className="text-xs text-gray-600 mb-4">View all registered events</p>
                 </div>
-                <QrCodePlaceholder />
+                <QrCode contestantId={id} />
               </div>
             </div>
           </div>
 
-          {/* Programs Section for Main Date */}
           <div className="">
             <ProgramSection date={mainDate} programs={mainPrograms} />
           </div>
 
-          {/* Programs Sections for Other Dates */}
           {otherDates.map((date) => (
             <div key={date} className="">
               <ProgramSection date={date} programs={programsByDate[date]} />
@@ -290,7 +619,6 @@ export default function HallTicket() {
         </div>
       </div>
 
-      {/* Enhanced Print Button */}
       <div className="mt-8 text-center print:hidden">
         <button
           onClick={() => window.print()}
@@ -300,7 +628,6 @@ export default function HallTicket() {
         </button>
       </div>
 
-      {/* Enhanced Print-specific styles for exact web-to-PDF matching */}
       <style jsx>{`
         @media print {
           @page {
@@ -347,7 +674,6 @@ export default function HallTicket() {
             page-break-inside: avoid !important;
           }
 
-          /* Force exact colors for PDF */
           .bg-black {
             background-color: #000000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -400,13 +726,11 @@ export default function HallTicket() {
             color: #9ca3af !important;
           }
 
-          /* Ensure shadows are removed in print */
           .shadow-sm,
           .shadow-lg {
             box-shadow: none !important;
           }
 
-          /* Fix font sizes for print */
           .text-8xl {
             font-size: 6rem !important;
             line-height: 1 !important;
@@ -417,12 +741,10 @@ export default function HallTicket() {
             line-height: 1 !important;
           }
 
-          /* Ensure proper spacing in print */
           .min-h-screen {
             min-height: auto !important;
           }
 
-          /* Force table borders to show */
           .border-2 {
             border-width: 2px !important;
             border-style: solid !important;
@@ -454,7 +776,6 @@ export default function HallTicket() {
           }
         }
 
-        /* Better responsive font sizing */
         @media (max-width: 768px) {
           .text-8xl {
             font-size: 4rem;
@@ -476,6 +797,7 @@ export default function HallTicket() {
     </div>
   );
 }
+
 // "use client";
 // import { useParams } from "next/navigation";
 // import { useEffect, useState } from "react";
