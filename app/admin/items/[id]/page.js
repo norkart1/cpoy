@@ -339,7 +339,7 @@ export default function ManageItemPage() {
     rows.push([]); // Empty row for spacing
 
     // Add headers
-    rows.push(["Name", "Group", "Category", "Type", "Stage"]);
+    rows.push(["Name", "Group", "Category",]);
 
     // Add participant data
     filtered.forEach((p) => {
@@ -347,8 +347,6 @@ export default function ManageItemPage() {
         p.name || "Unknown",
         p.groupName || "N/A",
         p.category,
-        p.type,
-        p.stage,
       ]);
     });
 
@@ -406,8 +404,6 @@ export default function ManageItemPage() {
                   <th className="px-4 py-3 border-b">Name</th>
                   <th className="px-4 py-3 border-b">Group</th>
                   <th className="px-4 py-3 border-b">Category</th>
-                  <th className="px-4 py-3 border-b">Type</th>
-                  <th className="px-4 py-3 border-b">Stage</th>
                 </tr>
               </thead>
               <tbody className="text-gray-800">
@@ -417,8 +413,6 @@ export default function ManageItemPage() {
                     <td className="px-4 py-3 border-b font-medium">{p.name}</td>
                     <td className="px-4 py-3 border-b">{p.groupName || "N/A"}</td>
                     <td className="px-4 py-3 border-b capitalize">{p.category}</td>
-                    <td className="px-4 py-3 border-b">{p.type}</td>
-                    <td className="px-4 py-3 border-b capitalize">{p.stage}</td>
                   </tr>
                 ))}
               </tbody>
