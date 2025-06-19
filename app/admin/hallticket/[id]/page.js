@@ -87,42 +87,66 @@ const QrCodePlaceholder = () => (
   </svg>
 );
 
-// Enhanced Program Section with better spacing and typography
-const ProgramSection = ({ contestant, programs }) => (
-  <div className="border-2 border-black shadow-sm">
-    {/* Enhanced Competitions Table */}
-    <div className="flex flex-col min-h-[18rem]">
-      {/* Table Body with improved spacing and hover effects */}
-      <div className="flex-grow text-black bg-white">
-        {programs && programs.length > 0 ? (
-          programs.map((p, i) => (
-            <div
-              key={i}
-              className="flex border-b border-gray-200 hover:bg-gray-50 transition-colors duration-150 print:page-break-inside-avoid"
-            >
-              <div className="w-1/3 p-4 border-r border-gray-200 text-center text-gray-600 font-medium">
-                TBA
+// Enhanced Program Section with modern black-and-white UI
+const ProgramSection = ({ date, programs }) => {
+  // Format date as DD - MM - YYYY
+  const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).replace(/\//g, ' - ');
+
+  // Get Malayalam day name
+  const malayalamDays = ['ഞായർ', 'തിങ്കൾ', 'ചൊവ്വ', 'ബുധൻ', 'വ്യാഴം', 'വെള്ളി', 'ശനി'];
+  const dayIndex = new Date(date).getDay();
+  const malayalamDay = malayalamDays[dayIndex];
+
+  return (
+    <div className="mx-12 bg-gradient-to-b from-gray-100 to-white rounded-lg">
+      {/* Top Bar Date: Compact badge style, not full-width */}
+      <div className="flex justify-center py-4">
+        <span className="bg-black text-white text-center py-2 px-4 text-base font-medium tracking-wide rounded-full">
+          {formattedDate} {malayalamDay}
+        </span>
+      </div>
+
+      {/* Competitions Table */}
+      <div className="flex flex-col min-h-[18rem] p-2">
+        {/* Table Body */}
+        <div className="flex-grow text-black">
+          {programs && programs.length > 0 ? (
+            programs.map((p, i) => (
+              <div
+                key={i}
+                className="flex bg-white border border-gray-200 rounded mb-2 hover:bg-gray-50 transition-colors duration-150 print:page-break-inside-avoid"
+              >
+                <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+                  {p.timeRange?.start && p.timeRange?.end ? `${p.timeRange.start} - ${p.timeRange.end}` : 'TBA'}
+                </div>
+                <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+                  {p.stage === 'stage' ? 'Stage' : 'Non-Stage'}
+                </div>
+                <div className="w-1/4 p-2 text-center text-gray-600 font-medium">
+                  {p.category || 'Unknown'}
+                </div>
+                <div className="w-1/4 p-2 text-center font-semibold text-black">
+                  {p.name}
+                </div>
               </div>
-              <div className="w-1/3 p-4 border-r border-gray-200 text-center text-gray-600 font-medium">
-                Non-Stage
-              </div>
-              <div className="w-1/3 p-4 text-center font-medium text-black">
-                {p.name}
+            ))
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 p-4">
+              <div className="text-center">
+                <div className="text-lg font-medium mb-2">No competitions assigned</div>
+                <div className="text-sm text-gray-400">Programs will appear here when available</div>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500 p-8">
-            <div className="text-center">
-              <div className="text-lg font-medium mb-2">No competitions assigned</div>
-              <div className="text-sm text-gray-400">Programs will appear here when available</div>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function HallTicket() {
   const { id } = useParams();
@@ -171,15 +195,41 @@ export default function HallTicket() {
 
   const { contestant, programs } = data;
 
+  // Group programs by date, handling invalid dates
+  const programsByDate = programs.reduce((acc, program) => {
+    // Validate program.date
+    if (!program.date || isNaN(new Date(program.date).getTime())) {
+      console.warn('Invalid date found in program:', program);
+      return acc; // Skip programs with invalid dates
+    }
+    const programDate = new Date(program.date).toISOString().split('T')[0];
+    if (!acc[programDate]) {
+      acc[programDate] = [];
+    }
+    acc[programDate].push(program);
+    return acc;
+  }, {});
+
+  // Main date for display
+  const mainDate = '2025-06-21';
+
+  // Filter programs for main date
+  const mainPrograms = programsByDate[mainDate] || [];
+
+  // Other dates excluding main date
+  const otherDates = Object.keys(programsByDate)
+    .filter((date) => date !== mainDate)
+    .sort(); // Sort dates chronologically
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 print:bg-white print:p-0">
       <div className="w-full max-w-4xl bg-white shadow-lg print:shadow-none border border-gray-200 print:border-none">
         {/* First Page with enhanced styling */}
-        <div className="p-12 print:page">
+        <div className="pt-4 print:page mb-6">
           {/* Header Section with better spacing */}
-          <div className="p-4 mb-6">
+          <div className="mb-2">
             <img
-              src="/hallTicket-01.png"
+              src="/header-01.png"
               alt="Alathurpadi Dars Fest Header"
               className="w-full h-auto rounded-sm"
               onError={(e) => {
@@ -204,19 +254,19 @@ export default function HallTicket() {
           </div>
 
           {/* Enhanced Title Banner */}
-          <div className="border-2 border-black shadow-sm">
+          <div className="mx-12 border-2 border-black shadow-sm">
             <div className="bg-black text-white text-center py-3 text-xl font-bold tracking-wider">
               HALL TICKET FOR NON STAGE
             </div>
 
             {/* Main Details Section with improved layout */}
-            <div className="flex border-b-2 border-black bg-white">
-              <div className="w-2/3 flex items-center justify-center border-r-2 border-black py-8">
-                <span className="text-8xl md:text-9xl font-black text-black tracking-tighter leading-none">
+            <div className="flex bg-white">
+              <div className="w-2/3 flex items-center justify-center border-r-2 border-black py-2">
+                <span className="text-[200px] md:text-[200px] font-black text-black tracking-tighter leading-none">
                   {contestant.contestantNumber}
                 </span>
               </div>
-              <div className="w-1/3 flex flex-col items-center justify-center p-6 space-y-4">
+              <div className="w-1/3 flex flex-col items-center justify-center space-y-2">
                 <div className="text-center">
                   <p className="text-sm font-semibold text-black mb-1">Fest Updates Here</p>
                   <p className="text-xs text-gray-600 mb-4">Scan Me!</p>
@@ -226,12 +276,17 @@ export default function HallTicket() {
             </div>
           </div>
 
-          {/* Programs Section */}
-          {programs && (
-            <div className="mt-6">
-              <ProgramSection contestant={contestant} programs={programs} />
+          {/* Programs Section for Main Date */}
+          <div className="">
+            <ProgramSection date={mainDate} programs={mainPrograms} />
+          </div>
+
+          {/* Programs Sections for Other Dates */}
+          {otherDates.map((date) => (
+            <div key={date} className="">
+              <ProgramSection date={date} programs={programsByDate[date]} />
             </div>
-          )}
+          ))}
         </div>
       </div>
 
