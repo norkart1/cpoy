@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 
 const ItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: {
+    type: String,
+    required: true,
+    get: (value) => value.toUpperCase(),
+  },
   category: {
     type: String,
     enum: ['subjunior', 'junior', 'senior', 'general(individual)', 'general(group)'],
