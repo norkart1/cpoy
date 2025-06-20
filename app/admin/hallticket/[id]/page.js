@@ -228,8 +228,8 @@ export default function HallTicket() {
               </div>
               <div className="w-1/3 flex flex-col items-center justify-center space-y-2">
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-black mb-1">Scan for Events</p>
-                  <p className="text-xs text-gray-600 mb-4">View all registered events</p>
+                  <p className="text-sm font-semibold text-black mb-1">Scan for Programs</p>
+                  <p className="text-xs text-gray-600 mb-4">View all registered programs</p>
                 </div>
                 <QrCode contestantNumber={contestant.contestantNumber} />
               </div>
