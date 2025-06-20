@@ -782,7 +782,7 @@ export default function AddItem() {
 
 
 
-                      <div className="flex flex-col md:flex-row gap-6 p-4 rounded-xl bg-white/50 shadow-sm border border-gray-200">
+                      <div className="flex flex-col md:flex-row gap-6 p-4 rounded-xl bg-white/50 shadow-sm border border-gray-200 capitalize">
                         {/* Left Column: Item Info */}
                         <div className="flex-1">
                           <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">

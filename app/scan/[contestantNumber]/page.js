@@ -250,7 +250,7 @@ export default function ScanContestantPage() {
                   </thead>
                   <tbody>
                     {items.map((item, index) => (
-                      <tr key={index} className="border-b border-indigo-100 hover:bg-indigo-50/30">
+                      <tr key={index} className="border-b border-indigo-100 hover:bg-indigo-50/30 capitalize">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2 font-medium">
                             <CheckCircle2 className="w-4 h-4 text-green-500" />
