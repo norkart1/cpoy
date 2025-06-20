@@ -235,10 +235,10 @@ export default function HallTicket() {
               </div>
             </div>
             <div className="flex justify-center items-center gap-6 bg-black text-white py-4">
-              <p className="w-2/3 text-2xl font-semibold tracking-wider ps-4 capitalize">
+              <p className="w-2/3 text-md font-sm tracking-wider ps-4 capitalize">
                 {contestant.name || 'N/A'}
               </p>
-              <p className="w-1/3 text-xl font-medium tracking-wide capitalize">
+              <p className="w-1/3 text-md font-sm tracking-wide capitalize">
                 {contestant.groupName || 'N/A'}
               </p>
             </div>
