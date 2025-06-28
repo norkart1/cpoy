@@ -631,19 +631,21 @@ export default function ContestantsPage() {
             <UserSidebar />
             <main className="flex-1 p-6 lg:p-8">
                 {/* Header */}
-                <header className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-lg border border-white/30 sticky top-4 z-20">
+                <header className="bg-transparent backdrop-blur-lg rounded-3xl p-6 mb-6 border border-white/20 shadow-xl sticky top-4 z-20">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+                        {/* Left: Title & Group Info */}
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
                                 <Users className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Contestants Management</h1>
-                                <p className="text-sm text-gray-600">
-                                    Group: <span className="font-medium text-indigo-600">{groupName}</span>
-                                </p>
+                                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Hey, <span className="text-indigo-600">{groupName}</span> 👋</h1>
+                                <p className="text-sm text-gray-500 mb-1">Manage your contestants</p>
                             </div>
                         </div>
+
+                        {/* Right: Actions */}
                         <div className="flex items-center gap-3">
                             {selectedContestants.length > 0 && (
                                 <button
@@ -654,7 +656,7 @@ export default function ContestantsPage() {
                                     Delete Selected ({selectedContestants.length})
                                 </button>
                             )}
-                            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm">
+                            <button className="flex items-center gap-2 px-4 py-2 bg-white/70 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-white transition-all shadow-sm backdrop-blur-md">
                                 <Download className="w-4 h-4" />
                                 Export CSV
                             </button>
@@ -665,41 +667,42 @@ export default function ContestantsPage() {
                                 Dashboard
                             </Link>
                         </div>
+
                     </div>
                 </header>
 
+
                 {/* Stats Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-                    {[
-                        { label: 'Total', value: stats.total, color: 'indigo' },
-                        { label: 'Offstage Completed', value: stats.offstageCompleted, color: 'emerald' },
-                        { label: 'Offstage In Progress', value: stats.offstageInProgress, color: 'amber' },
-                        { label: 'Offstage Pending', value: stats.offstagePending, color: 'gray' },
-                        { label: 'Onstage Completed', value: stats.onstageCompleted, color: 'emerald' },
-                        { label: 'Onstage In Progress', value: stats.onstageInProgress, color: 'amber' },
-                        { label: 'Onstage Pending', value: stats.onstagePending, color: 'gray' },
-                    ].map((stat, index) => (
-                        <div
-                            key={index}
-                            className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                            role="region"
-                            aria-label={`Statistic: ${stat.label}`}
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={`p-3 rounded-2xl bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 shadow-lg`}>
-                                    <BarChart2 className="w-6 h-6 text-white" />
-                                </div>
-                                <span className={`px-3 py-1 bg-${stat.color}-100 text-${stat.color}-700 rounded-full text-xs font-semibold`}>
-                                    {stat.value}/{stats.total}
-                                </span>
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</h3>
-                                <p className="text-gray-600 text-sm">{stat.label}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+  {[
+    { label: 'Total', value: stats.total },
+    { label: 'Offstage Completed', value: stats.offstageCompleted },
+    { label: 'Offstage In Progress', value: stats.offstageInProgress },
+    { label: 'Offstage Pending', value: stats.offstagePending },
+    { label: 'Onstage Completed', value: stats.onstageCompleted },
+    { label: 'Onstage In Progress', value: stats.onstageInProgress },
+    { label: 'Onstage Pending', value: stats.onstagePending },
+  ].map((stat, index) => (
+    <div
+      key={index}
+      className="bg-white rounded-3xl p-6 shadow-md border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300"
+      role="region"
+      aria-label={`Statistic: ${stat.label}`}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="p-3 min-w-[4] rounded-2xl bg-gray-100 shadow-inner">
+          <h3 className="text-2xl font-bold text-black mb-1">{stat.value}</h3>
+        </div>
+        <p className="text-gray-700 text-sm capitalize">{stat.label}</p>
+        <span className="px-3 py-1 bg-gray-200 text-black rounded-full text-xs font-semibold">
+          {stat.value}/{stats.total}
+        </span>
+      </div>
+    </div>
+  ))}
+</div>
+
+
 
                 {/* Filters */}
                 <div className="mb-6 flex flex-col md:flex-row gap-4 bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 shadow-lg">
@@ -842,7 +845,7 @@ export default function ContestantsPage() {
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         className="absolute bottom-3 right-3 h-5 w-5 appearance-none rounded-md border-2 border-gray-300 bg-white/80 checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 cursor-pointer transition-all duration-200 hover:border-indigo-400 group-hover:shadow-sm peer"
-                                        aria-label={`Select contestant ${contestant.name || 'Contestant'}`}
+                                        aria-label={`Select contestant  ${contestant.name || 'Contestant'}`}
                                     />
                                     <span className="absolute bottom-3 right-3 h-5 w-5 flex justify-center items-center pointer-events-none hidden peer-checked:flex">
                                         <svg
@@ -874,7 +877,7 @@ export default function ContestantsPage() {
                                             {contestant.name ? contestant.name.charAt(0).toUpperCase() : 'N'}
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors capitalize">
                                                 {contestant.name || 'N/A'}
                                             </h3>
                                             <p className="text-sm text-gray-600">

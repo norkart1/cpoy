@@ -201,13 +201,7 @@ const router = useRouter();
               </div>
             </div>
           )}
-          {/* Form Section */}
-
-          {/* <div className="p-6 max-w-4xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">
-              Contestants {groupName ? `in ${groupName}` : "List"}
-            </h1>
-          </div> */}
+        
 
           <div>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
