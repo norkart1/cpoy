@@ -16,10 +16,9 @@ import {
 
 // Sample team data (replace with MongoDB query if needed)
 const teams = [
-  { name: "Ma'abariyah", score: 450 },
-  { name: "Team 1", score: 380 },
-  { name: "Team 2", score: 320 },
-  { name: "Team 3", score: 285 },
+  { name: "QUDWATHULULAMA", score: 450 },
+  { name: "SUHBATHUSSADATH", score: 380 },
+  { name: "NUSRATHULUMARA", score: 320 },
 ];
 
 const achievements = [
