@@ -273,7 +273,7 @@ const router = useRouter();
                     </div>
 
                     <div className="mb-6">
-                      <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
+                      <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors capitalize">
                         {item.name}
                       </h3>
                       <p className="text-gray-600 text-sm">
