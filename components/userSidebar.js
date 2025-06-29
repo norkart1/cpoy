@@ -31,9 +31,10 @@ export default function UserSidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-64 z-40 h-screen bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform overflow-y-auto
-    ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} lg:relative lg:shadow-lg`}
-      >
+  className={`h-screen w-64 z-40 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform overflow-y-auto
+  ${isOpen ? "fixed top-0 left-0 translate-x-0" : "fixed top-0 left-0 -translate-x-full"} lg:sticky lg:top-0 lg:translate-x-0 lg:shadow-lg`}
+>
+
 
 
         {/* Close button (mobile only) */}
