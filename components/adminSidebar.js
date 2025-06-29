@@ -200,8 +200,8 @@ export default function AdminSidebar() {
                 <Link
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
-                      ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
-                      : "text-indigo-100 hover:bg-white/10 hover:text-white"
+                    ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
+                    : "text-indigo-100 hover:bg-white/10 hover:text-white"
                     }`}
                 >
                   <span className="inline-flex items-center justify-center text-lg w-8 h-8 rounded-md bg-white/10 text-white group-hover:bg-white/20">
