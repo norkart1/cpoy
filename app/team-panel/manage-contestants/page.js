@@ -636,7 +636,7 @@ export default function ContestantsPage() {
 
                         {/* Left: Title & Group Info */}
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-md">
                                 <Users className="w-6 h-6 text-white" />
                             </div>
                             <div>
@@ -656,10 +656,6 @@ export default function ContestantsPage() {
                                     Delete Selected ({selectedContestants.length})
                                 </button>
                             )}
-                            <button className="flex items-center gap-2 px-4 py-2 bg-white/70 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-white transition-all shadow-sm backdrop-blur-md">
-                                <Download className="w-4 h-4" />
-                                Export CSV
-                            </button>
                             <Link
                                 href="/"
                                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
@@ -673,34 +669,34 @@ export default function ContestantsPage() {
 
 
                 {/* Stats Overview */}
-<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-  {[
-    { label: 'Total', value: stats.total },
-    { label: 'Offstage Completed', value: stats.offstageCompleted },
-    { label: 'Offstage In Progress', value: stats.offstageInProgress },
-    { label: 'Offstage Pending', value: stats.offstagePending },
-    { label: 'Onstage Completed', value: stats.onstageCompleted },
-    { label: 'Onstage In Progress', value: stats.onstageInProgress },
-    { label: 'Onstage Pending', value: stats.onstagePending },
-  ].map((stat, index) => (
-    <div
-      key={index}
-      className="bg-white rounded-3xl p-6 shadow-md border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300"
-      role="region"
-      aria-label={`Statistic: ${stat.label}`}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="p-3 min-w-[4] rounded-2xl bg-gray-100 shadow-inner">
-          <h3 className="text-2xl font-bold text-black mb-1">{stat.value}</h3>
-        </div>
-        <p className="text-gray-700 text-sm capitalize">{stat.label}</p>
-        <span className="px-3 py-1 bg-gray-200 text-black rounded-full text-xs font-semibold">
-          {stat.value}/{stats.total}
-        </span>
-      </div>
-    </div>
-  ))}
-</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+                    {[
+                        { label: 'Total', value: stats.total },
+                        { label: 'Offstage Completed', value: stats.offstageCompleted },
+                        { label: 'Offstage In Progress', value: stats.offstageInProgress },
+                        { label: 'Offstage Pending', value: stats.offstagePending },
+                        { label: 'Onstage Completed', value: stats.onstageCompleted },
+                        { label: 'Onstage In Progress', value: stats.onstageInProgress },
+                        { label: 'Onstage Pending', value: stats.onstagePending },
+                    ].map((stat, index) => (
+                        <div
+                            key={index}
+                            className="bg-white rounded-3xl p-6 shadow-md border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                            role="region"
+                            aria-label={`Statistic: ${stat.label}`}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-3 min-w-[4] rounded-2xl bg-gray-100 shadow-inner">
+                                    <h3 className="text-2xl font-bold text-black mb-1">{stat.value}</h3>
+                                </div>
+                                <p className="text-gray-700 text-sm capitalize">{stat.label}</p>
+                                <span className="px-3 py-1 bg-gray-200 text-black rounded-full text-xs font-semibold">
+                                    {stat.value}/{stats.total}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
 
 

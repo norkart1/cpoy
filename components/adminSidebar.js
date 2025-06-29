@@ -163,10 +163,10 @@ export default function AdminSidebar() {
 
       {/* Sidebar Panel */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } lg:relative lg:translate-x-0 lg:shadow-lg`}
+        className={`h-screen w-64 z-40 bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-transform duration-300 ease-in-out transform overflow-y-auto
+  ${isOpen ? "fixed top-0 left-0 translate-x-0" : "fixed top-0 left-0 -translate-x-full"} lg:sticky lg:top-0 lg:translate-x-0 lg:shadow-lg`}
       >
+
         {/* Mobile Close Button */}
         <button
           onClick={() => setIsOpen(false)}
@@ -199,11 +199,10 @@ export default function AdminSidebar() {
               <li key={index}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-                    isActive(item.href)
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
                       ? "bg-white bg-opacity-20 text-white font-semibold shadow-inner"
                       : "text-indigo-100 hover:bg-white/10 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <span className="inline-flex items-center justify-center text-lg w-8 h-8 rounded-md bg-white/10 text-white group-hover:bg-white/20">
                     <item.icon size={20} />
