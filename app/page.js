@@ -740,7 +740,7 @@ export default function HomePage() {
                 <span className="text-2xl font-bold font-geist-sans tracking-wide">{team.teamName}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-3xl font-black font-geist-mono">{team.totalScore}</span>
+                <span className="text-3xl font-black font-geist-mono">{team.totalPoints}</span>
                 <span className="text-lg opacity-70 font-geist-mono">pts</span>
               </div>
             </div>

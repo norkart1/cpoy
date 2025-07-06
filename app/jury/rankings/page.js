@@ -13,6 +13,7 @@ export default function RankingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const juryId = searchParams.get("juryId");
+  const rankingsParam = searchParams.get("rankings");
 
   useEffect(() => {
     if (!juryId) {
@@ -21,52 +22,54 @@ export default function RankingsPage() {
       return;
     }
 
-    const fetchRankings = async () => {
+    // Use rankings from query params if available and valid
+    if (rankingsParam && rankingsParam !== "undefined") {
       try {
-        console.log("Fetching rankings with juryId:", juryId);
-        const res = await axios.get("/api/jury/rankings", {
-          params: { juryId },
-        });
-        console.log("Rankings API response:", res.data);
-        if (res.data.success) {
-          const rankings = res.data.rankings || [];
-          setRankings(rankings);
-          // Extract itemName and category from first ranking, if available
-          if (rankings.length > 0) {
-            setItemName(rankings[0].itemName || "N/A");
-            setCategory(rankings[0].category || "N/A");
-          } else {
-            // Fallback: Fetch item details if no rankings
-            const stored = localStorage.getItem("jury");
-            if (stored) {
-              const parsed = JSON.parse(stored);
-              if (parsed.assignedItems?.length > 0) {
-                try {
-                  const itemRes = await axios.get("/api/jury/items", {
-                    params: { itemIds: parsed.assignedItems[0] },
-                  });
-                  console.log("Item API response:", itemRes.data);
-                  if (itemRes.data.success && itemRes.data.items?.length > 0) {
-                    setItemName(itemRes.data.items[0].name || "N/A");
-                    setCategory(itemRes.data.items[0].category || "N/A");
-                  }
-                } catch (err) {
-                  console.error("Error fetching item:", err.response?.data || err.message);
-                }
-              }
-            }
+        const decodedParam = decodeURIComponent(rankingsParam);
+        const parsedRankings = JSON.parse(decodedParam);
+        console.log("Parsed Rankings:", parsedRankings); // Debug log
+        if (Array.isArray(parsedRankings)) {
+          setRankings(parsedRankings);
+          if (parsedRankings.length > 0) {
+            setItemName(parsedRankings[0].itemName || "N/A");
+            setCategory(parsedRankings[0].category || "N/A");
           }
         } else {
-          setMessage({ type: "error", text: res.data.message || "Failed to load rankings." });
+          throw new Error("Invalid rankings format");
         }
       } catch (err) {
-        console.error("Error fetching rankings:", err.response?.data || err.message);
-        setMessage({ type: "error", text: "Server error fetching rankings." });
+        console.error("Error parsing rankings:", err);
+        setMessage({ type: "error", text: "Invalid rankings data. Fetching from server..." });
       }
-    };
+    }
 
-    fetchRankings();
-  }, [juryId, router]);
+    // Fallback to API fetch if no valid rankings param or parsing fails
+    // if (!rankings.length) {
+    //   const fetchRankings = async () => {
+    //     try {
+    //       console.log("Fetching rankings with juryId:", juryId);
+    //       const res = await axios.get("/api/jury/rankings", {
+    //         params: { juryId },
+    //       });
+    //       console.log("Rankings API response:", res.data);
+    //       if (res.data.success) {
+    //         const rankings = res.data.rankings || [];
+    //         setRankings(rankings);
+    //         if (rankings.length > 0) {
+    //           setItemName(rankings[0].itemName || "N/A");
+    //           setCategory(rankings[0].category || "N/A");
+    //         }
+    //       } else {
+    //         setMessage({ type: "error", text: res.data.message || "Failed to load rankings." });
+    //       }
+    //     } catch (err) {
+    //       console.error("Error fetching rankings:", err.response?.data || err.message);
+    //       setMessage({ type: "error", text: "Server error fetching rankings." });
+    //     }
+    //   };
+    //   fetchRankings();
+    // }
+  }, [juryId, router, rankingsParam]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
@@ -117,10 +120,6 @@ export default function RankingsPage() {
           <h2 className="text-3xl font-bold text-white mb-8 drop-shadow-md">Leaderboard</h2>
           {rankings.length === 0 ? (
             <div className="text-center py-20">
-              <div className="w-32 h-32 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Trophy className="w-16 h-16 text-yellow-600" />
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-3 drop-shadow">No rankings available</h3>
               <p className="text-gray-200">No scores have been submitted yet.</p>
             </div>
           ) : (
@@ -133,19 +132,16 @@ export default function RankingsPage() {
                   <div className="flex items-center gap-4">
                     <div
                       className={`flex items-center justify-center text-white font-bold text-sm shadow-md ${
-                        index === 0
+                        rank.rank === "1st"
                           ? "w-12 h-12 bg-yellow-500 clip-path-triangle"
-                          : index === 1
+                          : rank.rank === "2nd"
                           ? "w-12 h-12 bg-gray-400 rounded-full"
-                          : index === 2
+                          : rank.rank === "3rd"
                           ? "w-12 h-12 bg-amber-600 clip-path-hexagon"
                           : "w-12 h-12 bg-indigo-500 rounded-full"
                       }`}
                     >
-                      {index === 0 && "1st"}
-                      {index === 1 && "2nd"}
-                      {index === 2 && "3rd"}
-                      {index >= 3 && index + 1}
+                      {rank.rank}
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-gray-800">{rank.name}</h3>
@@ -164,4 +160,12 @@ export default function RankingsPage() {
   );
 }
 
-/* CSS for custom clip-path shapes */
+// /* CSS for custom clip-path shapes */
+// <style>
+//   .clip-path-triangle {
+//     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+//   }
+//   .clip-path-hexagon {
+//     clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+//   }
+// </style>

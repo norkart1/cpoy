@@ -51,7 +51,7 @@ export async function GET(req) {
           preserveNullAndEmptyArrays: true,
         },
       },
-      // Project final fields
+      // Project final fields with rank
       {
         $project: {
           contestantId: '$_id',
@@ -65,10 +65,33 @@ export async function GET(req) {
           itemName: { $ifNull: ['$itemName', 'N/A'] },
           category: { $ifNull: ['$category', 'N/A'] },
           totalScore: 1,
+          rank: { $concat: [{ $toString: { $add: [{ $indexOfArray: [ '$$ROOT', '$$CURRENT' ] }, 1] } }] }, // Assign rank based on sort order
         },
       },
       // Sort by totalScore (descending)
       { $sort: { totalScore: -1 } },
+      // Update rank to use "1st", "2nd", "3rd" for top 3, then numeric
+      {
+        $project: {
+          contestantId: 1,
+          name: 1,
+          contestantNumber: 1,
+          teamName: 1,
+          itemName: 1,
+          category: 1,
+          totalScore: 1,
+          rank: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$rank', '1'] }, then: '1st' },
+                { case: { $eq: ['$rank', '2'] }, then: '2nd' },
+                { case: { $eq: ['$rank', '3'] }, then: '3rd' },
+              ],
+              default: '$rank',
+            },
+          },
+        },
+      },
     ]);
 
     console.log('Rankings:', rankings);

@@ -32,6 +32,7 @@ const ScoreSchema = new mongoose.Schema({
   },
   category: {
     type: String,
+    enum: ['subjunior', 'junior', 'senior', 'general(individual)', 'general(group)'],
     required: true,
   },
   type: {
@@ -39,9 +40,13 @@ const ScoreSchema = new mongoose.Schema({
     enum: ['A', 'B'],
     required: true,
   },
-  rank: {
+  stage: {
     type: String,
-    enum: ['1st', '2nd', '3rd'],
+    enum: ['stage', 'offstage'],
+    required: true,
+  },
+  rank: {
+    type: String, // Removed enum to allow numeric ranks
     required: false,
   },
   createdAt: {

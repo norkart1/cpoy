@@ -131,7 +131,13 @@ export default function JuryDashboard() {
       if (res.data.success) {
         setMessage({ type: "success", text: "Scores submitted successfully! Redirecting to rankings..." });
         setScores({});
-        setTimeout(() => router.push(`/jury/rankings?juryId=${jury._id}`), 1000);
+        // Proceed with redirection even if rankings is empty, let RankingsPage handle it
+        const rankings = res.data.rankings || [];
+        const queryParams = new URLSearchParams({
+          rankings: encodeURIComponent(JSON.stringify(rankings)),
+          juryId: jury._id,
+        }).toString();
+        setTimeout(() => router.push(`/jury/rankings?${queryParams}`), 1000);
       } else {
         setMessage({ type: "error", text: res.data.message || "Failed to submit scores." });
       }

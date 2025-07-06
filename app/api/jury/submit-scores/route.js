@@ -66,7 +66,7 @@ export async function POST(req) {
       participants: item.participants.map(p => p._id.toString()),
     })));
 
-    // Create a map of contestant IDs to item details including stage
+    // Create a map of contestant IDs to item details
     const contestantMap = new Map();
     items.forEach((item) => {
       (item.participants || []).forEach((participant) => {
@@ -75,21 +75,25 @@ export async function POST(req) {
           itemName: item.name || 'Unknown Competition',
           category: item.category || 'N/A',
           teamName: participant.groupName || 'N/A',
-          type: item.type || 'A', // Default to 'A' if type is missing
-          stage: item.stage || 'stage', // Default to 'stage' if stage is missing
+          type: item.type || 'A',
+          stage: item.stage || 'stage',
         });
       });
     });
 
     console.log('Contestant Map:', Array.from(contestantMap.entries()));
 
-    // Convert scores to array, sort, and take top 3
+    // Convert scores to array and sort
     const sortedScores = Object.entries(scores)
       .map(([contestantId, score]) => ({ contestantId, score: Number(score) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+      .sort((a, b) => b.score - a.score);
 
-    // Validate scores and prepare score documents for top 3
+    console.log('Sorted Scores:', sortedScores);
+
+    // Get total number of contestants with scores
+    const totalContestants = sortedScores.length;
+
+    // Validate scores and prepare score documents with ranks
     const scoreDocs = [];
     sortedScores.forEach((entry, index) => {
       const { contestantId, score } = entry;
@@ -104,10 +108,8 @@ export async function POST(req) {
 
       // Check if contestant is assigned to jury
       if (!contestantMap.has(contestantId)) {
-        return NextResponse.json(
-          { success: false, message: `Contestant ${contestantId} not assigned to this jury` },
-          { status: 400 }
-        );
+        console.log(`Contestant ${contestantId} not found in contestantMap`);
+        return;
       }
 
       // Validate score
@@ -120,21 +122,29 @@ export async function POST(req) {
       }
 
       const { itemId, itemName, category, teamName, type, stage } = contestantMap.get(contestantId);
-      scoreDocs.push({
-        jury: juryId,
-        contestant: contestantId,
-        item: itemId,
-        score: scoreNum,
-        teamName,
-        itemName,
-        category,
-        type,
-        stage,
-        rank: index === 0 ? '1st' : index === 1 ? '2nd' : '3rd',
-      });
+      // Assign rank based on position, capped at "2nd" if only two contestants
+      const rank = totalContestants <= 2
+        ? index < totalContestants ? ['1st', '2nd'][index] : null
+        : index < 3 ? ['1st', '2nd', '3rd'][index] : String(index + 1);
+      if (rank) {
+        scoreDocs.push({
+          jury: juryId,
+          contestant: contestantId,
+          item: itemId,
+          score: scoreNum,
+          teamName,
+          itemName,
+          category,
+          type,
+          stage,
+          rank,
+        });
+      }
     });
 
-    // Update or insert scores for top 3
+    console.log('Score Docs:', scoreDocs);
+
+    // Update or insert scores
     const operations = scoreDocs.map(async (doc) => {
       const existingScore = await Score.findOne({
         jury: doc.jury,
@@ -157,8 +167,31 @@ export async function POST(req) {
 
     await Promise.all(operations);
 
+    // Fetch contestant numbers for rankings
+    const contestantIds = scoreDocs.map(doc => doc.contestant);
+    const contestantsData = await Contestant.find({ _id: { $in: contestantIds } }).select('contestantNumber name');
+    console.log('Contestants Data:', contestantsData); // Debug log
+    const contestantNumberMap = new Map(contestantsData.map(c => [c._id.toString(), { number: c.contestantNumber, name: c.name }]));
+
+    // Prepare rankings data to pass to the frontend
+    const rankings = scoreDocs.map((doc) => {
+      const contestantData = contestantNumberMap.get(doc.contestant.toString()) || { number: 'N/A', name: 'Unknown Contestant' };
+      return {
+        contestantId: doc.contestant,
+        name: contestantData.name,
+        contestantNumber: contestantData.number,
+        teamName: doc.teamName,
+        itemName: doc.itemName,
+        category: doc.category,
+        totalScore: doc.score,
+        rank: doc.rank,
+      };
+    });
+
+    console.log('Rankings:', rankings);
+
     return NextResponse.json(
-      { success: true, message: 'Top 3 scores submitted successfully' },
+      { success: true, message: 'Scores submitted successfully', rankings },
       { status: 200 }
     );
   } catch (error) {

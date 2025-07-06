@@ -6,17 +6,11 @@ export async function GET(req) {
   try {
     await dbConnect();
 
-    // Define points based on rank and type
-    const pointsMap = {
-      A: { '1st': 5, '2nd': 3, '3rd': 1 },
-      B: { '1st': 15, '2nd': 10, '3rd': 5 },
-    };
-
     // Build the aggregation pipeline
     const pipeline = [
       // Match only documents with a rank (exclude unranked)
       { $match: { rank: { $in: ['1st', '2nd', '3rd'] } } },
-      // Project to calculate points based on rank and type
+      // Project to calculate points based on rank and category
       {
         $project: {
           teamName: 1,
@@ -24,26 +18,40 @@ export async function GET(req) {
             $switch: {
               branches: [
                 {
-                  case: { $eq: ['$type', 'A'] },
+                  case: { $eq: ['$category', 'general(individual)'] },
                   then: {
                     $switch: {
                       branches: [
-                        { case: { $eq: ['$rank', '1st'] }, then: pointsMap.A['1st'] },
-                        { case: { $eq: ['$rank', '2nd'] }, then: pointsMap.A['2nd'] },
-                        { case: { $eq: ['$rank', '3rd'] }, then: pointsMap.A['3rd'] },
+                        { case: { $eq: ['$rank', '1st'] }, then: 5 },
+                        { case: { $eq: ['$rank', '2nd'] }, then: 3 },
+                        { case: { $eq: ['$rank', '3rd'] }, then: 1 },
                       ],
                       default: 0,
                     },
                   },
                 },
                 {
-                  case: { $eq: ['$type', 'B'] },
+                  case: { $eq: ['$category', 'general(group)'] },
                   then: {
                     $switch: {
                       branches: [
-                        { case: { $eq: ['$rank', '1st'] }, then: pointsMap.B['1st'] },
-                        { case: { $eq: ['$rank', '2nd'] }, then: pointsMap.B['2nd'] },
-                        { case: { $eq: ['$rank', '3rd'] }, then: pointsMap.B['3rd'] },
+                        { case: { $eq: ['$rank', '1st'] }, then: 15 },
+                        { case: { $eq: ['$rank', '2nd'] }, then: 10 },
+                        { case: { $eq: ['$rank', '3rd'] }, then: 5 },
+                      ],
+                      default: 0,
+                    },
+                  },
+                },
+                // Default case for other categories (subjunior, junior, senior)
+                {
+                  case: { $ne: ['$category', null] },
+                  then: {
+                    $switch: {
+                      branches: [
+                        { case: { $eq: ['$rank', '1st'] }, then: 5 },
+                        { case: { $eq: ['$rank', '2nd'] }, then: 3 },
+                        { case: { $eq: ['$rank', '3rd'] }, then: 1 },
                       ],
                       default: 0,
                     },
