@@ -18,7 +18,7 @@ export default function AddItem() {
 const router = useRouter();
   const { data: session, status } = useSession();
 
-  const allowedTeams = ["QUDWATHULULAMA", "SUHBATHUSSADATH","NUSRATHULUMARA"];
+  const allowedTeams = ["QUDWATHULULAMA", "SUHBATHUSSADATH","NUSRATHULUMARA","team1"];
 
   useEffect(() => {
     if (status === "loading") return;

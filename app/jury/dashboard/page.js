@@ -22,7 +22,7 @@ export default function JuryDashboard() {
 
     try {
       const parsed = JSON.parse(stored);
-      console.log("Parsed jury data:", parsed); // Debug: Log jury object
+      console.log("Parsed jury data:", parsed);
       if (!parsed?._id || !parsed?.username) {
         console.error("Invalid jury data:", parsed);
         setMessage({ type: "error", text: "Invalid session. Please log in again." });
@@ -34,11 +34,11 @@ export default function JuryDashboard() {
 
       const fetchContestants = async () => {
         try {
-          console.log("Fetching contestants with juryId:", parsed._id); // Debug
+          console.log("Fetching contestants with juryId:", parsed._id);
           const res = await axios.get("/api/jury/contestants", {
             params: { juryId: parsed._id },
           });
-          console.log("Contestants API response:", res.data); // Debug
+          console.log("Contestants API response:", res.data);
           if (res.data.success) {
             setContestants(res.data.contestants || []);
           } else {
@@ -75,15 +75,16 @@ export default function JuryDashboard() {
     }
 
     try {
-      console.log("Submitting scores with juryId:", jury._id); // Debug
+      console.log("Submitting scores with juryId:", jury._id);
       const res = await axios.post("/api/jury/submit-scores", {
         juryId: jury._id,
         scores,
       });
-      console.log("Submit scores response:", res.data); // Debug
+      console.log("Submit scores response:", res.data);
       if (res.data.success) {
-        setMessage({ type: "success", text: "Scores submitted successfully!" });
+        setMessage({ type: "success", text: "Scores submitted successfully! Redirecting to rankings..." });
         setScores({});
+        setTimeout(() => router.push(`/jury/rankings?juryId=${jury._id}`), 1000);
       } else {
         setMessage({ type: "error", text: res.data.message || "Failed to submit scores." });
       }
@@ -134,10 +135,11 @@ export default function JuryDashboard() {
         {/* Alert Message */}
         {message && (
           <div
-            className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${message.type === "success"
+            className={`mb-8 px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:shadow-xl ${
+              message.type === "success"
                 ? "bg-green-500/10 text-green-700 border border-green-200/50"
                 : "bg-red-500/10 text-red-700 border border-red-200/50"
-              }`}
+            }`}
             onClick={() => setMessage(null)}
           >
             <div className="flex items-center gap-3">
@@ -174,7 +176,6 @@ export default function JuryDashboard() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="p-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg">
-                      {/* <User className="w-4 h-4 text-white" /> */}
                       <div className="text-white text-xs font-semibold mt-1">
                         {contestant.contestantNumber || "N/A"}
                       </div>
@@ -186,14 +187,13 @@ export default function JuryDashboard() {
                       value={scores[contestant._id] || ""}
                       onChange={(e) => handleScoreChange(contestant._id, e.target.value)}
                       className="w-24 p-2 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
-                      placeholder="(1-100)"
+                      placeholder="(0-50)"
                     />
                   </div>
                 </div>
               ))}
             </div>
           )}
-
         </div>
         <button
           onClick={handleSubmitScores}

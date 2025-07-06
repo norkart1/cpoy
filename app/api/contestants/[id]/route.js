@@ -9,6 +9,8 @@ export async function GET(req, { params }) {
   try {
     await connectToDatabase();
     const { id } = params;
+    console.log("iddddddddddddddddd",id);
+    
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
