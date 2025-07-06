@@ -38,7 +38,7 @@ export async function GET(req) {
       // Lookup contestant details
       {
         $lookup: {
-          from: 'contestants',
+          from: 'contestant',
           localField: '_id',
           foreignField: '_id',
           as: 'contestantDetails',
@@ -58,6 +58,9 @@ export async function GET(req) {
           name: {
             $ifNull: ['$contestantDetails.name', 'Unknown Contestant'],
           },
+          contestantNumber: {
+            $ifNull: ['$contestantDetails.contestantNumber', 'N/A'],
+          },
           teamName: { $ifNull: ['$teamName', 'N/A'] },
           itemName: { $ifNull: ['$itemName', 'N/A'] },
           category: { $ifNull: ['$category', 'N/A'] },
@@ -66,8 +69,6 @@ export async function GET(req) {
       },
       // Sort by totalScore (descending)
       { $sort: { totalScore: -1 } },
-      // Limit to top 3
-      { $limit: 3 },
     ]);
 
     console.log('Rankings:', rankings);

@@ -381,11 +381,11 @@ import {
 } from 'lucide-react';
 
 // Sample team data (replace with MongoDB query if needed)
-const teams = [
-  { name: "QUDWATHULULAMA", score: 450 },
-  { name: "SUHBATHUSSADATH", score: 380 },
-  { name: "NUSRATHULUMARA", score: 320 },
-];
+// const teams = [
+//   { name: "QUDWATHULULAMA", score: 450 },
+//   { name: "SUHBATHUSSADATH", score: 380 },
+//   { name: "NUSRATHULUMARA", score: 320 },
+// ];
 
 const achievements = [
   { count: "23", label: "Ranks from Jamia Nooriyya", highlight: true },
@@ -419,6 +419,25 @@ const features = [
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
+  const [teams,setTeams]=useState([])
+
+  useEffect(() => {
+    const fetchTeamScores = async () => {
+      try {
+        const res = await fetch('/api/team/total-scores');
+        const data = await res.json();
+        if (data.success) {
+          setTeams(data.scores);
+        } else {
+          console.error("Failed to fetch team scores:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching team scores:", err.message);
+      }
+    };
+
+    fetchTeamScores();
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -698,35 +717,35 @@ export default function HomePage() {
 
             <div className="max-w-4xl mx-auto">
               <div className="bg-white glass-effect rounded-3xl p-10 shadow-2xl border-2 border-gray-200 animate-glow">
-                <div className="grid grid-cols-1 gap-6">
-                  {teams.map((team, index) => (
-                    <div
-                      key={team.name}
-                      className={`group flex justify-between items-center p-8 rounded-2xl transition-all duration-500 hover:scale-105 border-2 ${
-                        index === 0
-                          ? "bg-black text-white border-black shadow-2xl animate-glow"
-                          : index === 1
-                          ? "bg-gray-800 text-white border-gray-800 shadow-xl"
-                          : index === 2
-                          ? "bg-gray-600 text-white border-gray-600 shadow-lg"
-                          : "bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className={`flex items-center justify-center w-14 h-14 rounded-full font-black text-2xl border-2 ${
-                          index < 3 ? "bg-white/20 border-white/30 text-white" : "bg-black text-white border-black"
-                        }`}>
-                          {index + 1}
-                        </div>
-                        <span className="text-2xl font-bold font-geist-sans tracking-wide">{team.name}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl font-black font-geist-mono">{team.score}</span>
-                        <span className="text-lg opacity-70 font-geist-mono">pts</span>
-                      </div>
-                    </div>
-                  ))}
+        <div className="grid grid-cols-1 gap-6">
+          {teams.map((team, index) => (
+            <div
+              key={team.teamName}
+              className={`group flex justify-between items-center p-8 rounded-2xl transition-all duration-500 hover:scale-105 border-2 ${
+                index === 0
+                  ? "bg-black text-white border-black shadow-2xl animate-glow"
+                  : index === 1
+                  ? "bg-gray-800 text-white border-gray-800 shadow-xl"
+                  : index === 2
+                  ? "bg-gray-600 text-white border-gray-600 shadow-lg"
+                  : "bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
+              }`}
+            >
+              <div className="flex items-center gap-6">
+                <div className={`flex items-center justify-center w-14 h-14 rounded-full font-black text-2xl border-2 ${
+                  index < 3 ? "bg-white/20 border-white/30 text-white" : "bg-black text-white border-black"
+                }`}>
+                  {index + 1}
                 </div>
+                <span className="text-2xl font-bold font-geist-sans tracking-wide">{team.teamName}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-3xl font-black font-geist-mono">{team.totalScore}</span>
+                <span className="text-lg opacity-70 font-geist-mono">pts</span>
+              </div>
+            </div>
+          ))}
+        </div>
 
                 <div className="mt-12 text-center">
                   <Link

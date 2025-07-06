@@ -19,8 +19,8 @@ const ScoreSchema = new mongoose.Schema({
   score: {
     type: Number,
     required: true,
-    min: 0,
-    max: 50,
+    min: 1,
+    max: 100,
   },
   teamName: {
     type: String,
@@ -33,6 +33,16 @@ const ScoreSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
+  },
+  type: {
+    type: String,
+    enum: ['A', 'B'],
+    required: true,
+  },
+  rank: {
+    type: String,
+    enum: ['1st', '2nd', '3rd'],
+    required: false,
   },
   createdAt: {
     type: Date,

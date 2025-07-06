@@ -8,6 +8,7 @@ import { User, Send, LogOut } from "lucide-react";
 export default function JuryDashboard() {
   const [jury, setJury] = useState(null);
   const [contestants, setContestants] = useState([]);
+  const [itemName, setItemName] = useState("");
   const [scores, setScores] = useState({});
   const [message, setMessage] = useState(null);
   const router = useRouter();
@@ -40,13 +41,17 @@ export default function JuryDashboard() {
           });
           console.log("Contestants API response:", res.data);
           if (res.data.success) {
-            setContestants(res.data.contestants || []);
+            const contestantsData = res.data.contestants || [];
+            setContestants(contestantsData);
+            setItemName(contestantsData.length > 0 ? contestantsData[0].itemName || "Unknown Competition" : "No Item Assigned");
           } else {
             setMessage({ type: "error", text: res.data.message || "Failed to load contestants." });
+            setItemName("No Item Assigned");
           }
         } catch (err) {
           console.error("Error fetching contestants:", err.response?.data || err.message);
           setMessage({ type: "error", text: "Server error fetching contestants." });
+          setItemName("No Item Assigned");
         }
       };
 
@@ -60,17 +65,59 @@ export default function JuryDashboard() {
   }, [router]);
 
   const handleScoreChange = (contestantId, value) => {
-    if (value === "" || (/^\d+$/.test(value) && +value >= 0 && +value <= 50)) {
-      setScores((prev) => ({
-        ...prev,
-        [contestantId]: value,
-      }));
+    // Allow empty input to clear the score
+    if (value === "") {
+      setScores((prev) => {
+        const newScores = { ...prev };
+        delete newScores[contestantId];
+        return newScores;
+      });
+      setMessage(null); // Clear any previous error message
+      return;
     }
+
+    // Validate score: must be an integer between 1 and 100
+    if (!/^\d+$/.test(value) || +value < 1 || +value > 100) {
+      setMessage({ type: "error", text: "Scores must be integers between 1 and 100." });
+      return;
+    }
+
+    // Check for duplicate scores
+    const scoreNum = Number(value);
+    const existingScores = Object.values(scores).map(Number);
+    if (existingScores.includes(scoreNum) && scores[contestantId] !== value) {
+      setMessage({ type: "error", text: `Score ${scoreNum} is already assigned to another contestant.` });
+      return;
+    }
+
+    // Update scores if valid
+    setScores((prev) => ({
+      ...prev,
+      [contestantId]: value,
+    }));
+    setMessage(null); // Clear any previous error message
   };
 
   const handleSubmitScores = async () => {
     if (Object.keys(scores).length === 0) {
       setMessage({ type: "error", text: "Please enter scores for at least one contestant." });
+      return;
+    }
+
+    // Validate all scores
+    for (const [contestantId, score] of Object.entries(scores)) {
+      const scoreNum = Number(score);
+      if (isNaN(scoreNum) || scoreNum < 1 || scoreNum > 100) {
+        setMessage({ type: "error", text: `Invalid score for contestant ${contestantId}: must be between 1 and 100.` });
+        return;
+      }
+    }
+
+    // Double-check for duplicates (in case of race conditions)
+    const scoreValues = Object.values(scores).map(Number);
+    const uniqueScores = new Set(scoreValues);
+    if (uniqueScores.size !== scoreValues.length) {
+      setMessage({ type: "error", text: "Duplicate scores detected. Each contestant must have a unique score." });
       return;
     }
 
@@ -116,6 +163,7 @@ export default function JuryDashboard() {
                 Hey!
               </h1>
               <p className="text-gray-600 mt-1">Welcome, {jury.username}</p>
+              <p className="text-gray-800 font-semibold mt-1">Assigned Item: {itemName}</p>
             </div>
             <button
               onClick={() => {
@@ -182,12 +230,12 @@ export default function JuryDashboard() {
                     </div>
                     <input
                       type="number"
-                      min="0"
-                      max="50"
+                      min="1"
+                      max="100"
                       value={scores[contestant._id] || ""}
                       onChange={(e) => handleScoreChange(contestant._id, e.target.value)}
                       className="w-24 p-2 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
-                      placeholder="(0-50)"
+                      placeholder="(1-100)"
                     />
                   </div>
                 </div>

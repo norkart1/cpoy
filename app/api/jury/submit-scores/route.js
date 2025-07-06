@@ -49,9 +49,9 @@ export async function POST(req) {
       );
     }
 
-    // Fetch items with populated participants
+    // Fetch items with populated participants and additional fields
     const items = await Item.find({ _id: { $in: jury.assignedItems } })
-      .select('_id name category participants')
+      .select('_id name category participants type stage')
       .populate({
         path: 'participants',
         select: '_id groupName',
@@ -61,10 +61,12 @@ export async function POST(req) {
       _id: item._id,
       name: item.name,
       category: item.category,
+      type: item.type,
+      stage: item.stage,
       participants: item.participants.map(p => p._id.toString()),
     })));
 
-    // Create a map of contestant IDs to item, itemName, category, and teamName
+    // Create a map of contestant IDs to item details including stage
     const contestantMap = new Map();
     items.forEach((item) => {
       (item.participants || []).forEach((participant) => {
@@ -73,15 +75,25 @@ export async function POST(req) {
           itemName: item.name || 'Unknown Competition',
           category: item.category || 'N/A',
           teamName: participant.groupName || 'N/A',
+          type: item.type || 'A', // Default to 'A' if type is missing
+          stage: item.stage || 'stage', // Default to 'stage' if stage is missing
         });
       });
     });
 
     console.log('Contestant Map:', Array.from(contestantMap.entries()));
 
-    // Validate scores and prepare score documents
+    // Convert scores to array, sort, and take top 3
+    const sortedScores = Object.entries(scores)
+      .map(([contestantId, score]) => ({ contestantId, score: Number(score) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    // Validate scores and prepare score documents for top 3
     const scoreDocs = [];
-    for (const [contestantId, score] of Object.entries(scores)) {
+    sortedScores.forEach((entry, index) => {
+      const { contestantId, score } = entry;
+
       // Validate contestantId
       if (!mongoose.isValidObjectId(contestantId)) {
         return NextResponse.json(
@@ -100,14 +112,14 @@ export async function POST(req) {
 
       // Validate score
       const scoreNum = Number(score);
-      if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 50) {
+      if (isNaN(scoreNum) || scoreNum < 1 || scoreNum > 100) {
         return NextResponse.json(
-          { success: false, message: `Invalid score for contestant ${contestantId}: ${score}` },
+          { success: false, message: `Invalid score for contestant ${contestantId}: ${score}, must be between 1 and 100` },
           { status: 400 }
         );
       }
 
-      const { itemId, itemName, category, teamName } = contestantMap.get(contestantId);
+      const { itemId, itemName, category, teamName, type, stage } = contestantMap.get(contestantId);
       scoreDocs.push({
         jury: juryId,
         contestant: contestantId,
@@ -116,32 +128,37 @@ export async function POST(req) {
         teamName,
         itemName,
         category,
+        type,
+        stage,
+        rank: index === 0 ? '1st' : index === 1 ? '2nd' : '3rd',
       });
-    }
-
-    // Check for existing scores to prevent duplicates
-    const existingScores = await Score.find({
-      jury: juryId,
-      contestant: { $in: scoreDocs.map((doc) => doc.contestant) },
-      item: { $in: scoreDocs.map((doc) => doc.item) },
     });
 
-    if (existingScores.length > 0) {
-      const duplicateContestants = existingScores.map((s) => s.contestant.toString());
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Scores already submitted for contestants: ${duplicateContestants.join(', ')}`,
-        },
-        { status: 400 }
-      );
-    }
+    // Update or insert scores for top 3
+    const operations = scoreDocs.map(async (doc) => {
+      const existingScore = await Score.findOne({
+        jury: doc.jury,
+        contestant: doc.contestant,
+        item: doc.item,
+      });
 
-    // Save scores
-    await Score.insertMany(scoreDocs);
+      if (existingScore) {
+        // Update existing score
+        return Score.findOneAndUpdate(
+          { jury: doc.jury, contestant: doc.contestant, item: doc.item },
+          { $set: { score: doc.score, type: doc.type, stage: doc.stage, rank: doc.rank, createdAt: new Date() } },
+          { new: true }
+        );
+      } else {
+        // Insert new score
+        return Score.create(doc);
+      }
+    });
+
+    await Promise.all(operations);
 
     return NextResponse.json(
-      { success: true, message: 'Scores submitted successfully' },
+      { success: true, message: 'Top 3 scores submitted successfully' },
       { status: 200 }
     );
   } catch (error) {
