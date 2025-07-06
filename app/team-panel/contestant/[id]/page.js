@@ -131,30 +131,6 @@ export default function ContestantDetailsPage() {
         }
 
         // ✅ Rule 1C: Max 5 from same team in stage programs
-<<<<<<< HEAD
-=======
-        // ✅ Rule 1C: Max 5 from same team in stage programs
-
-              if (program.stage === 'stage') {
-        // const generalIndividualItems = allPrograms.filter(p =>
-        //   p.category?.toLowerCase() === 'general(individual)' && p.participants.includes(id)
-        // ).length;
-        // if (generalIndividualItems >= 4) {
-        //   toast.error('Maximum 4 general(individual) items allowed per student.');
-        //   return;
-        // }
-
-        const programParticipants = allPrograms.find(p => p._id === programId)?.participants || [];
-        const teamParticipants = await fetchTeamParticipants(programParticipants, contestant.groupName);
-        if (teamParticipants >= 5) {
-          toast.error('Maximum 5 contestants from the same team allowed in this general(individual) item.');
-          return;
-        }
-      }
-
-
-
->>>>>>> 7bb7924 (jury add score and dispay ranks)
         if (program.stage === 'stage') {
           const programParticipants = allPrograms.find(p => p._id === programId)?.participants || [];
           const teamParticipants = await fetchTeamParticipants(programParticipants, contestant.groupName);
