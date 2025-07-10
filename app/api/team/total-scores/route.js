@@ -18,44 +18,40 @@ export async function GET(req) {
             $switch: {
               branches: [
                 {
-                  case: { $eq: ['$category', 'general(individual)'] },
-                  then: {
-                    $switch: {
-                      branches: [
-                        { case: { $eq: ['$rank', '1st'] }, then: 5 },
-                        { case: { $eq: ['$rank', '2nd'] }, then: 3 },
-                        { case: { $eq: ['$rank', '3rd'] }, then: 1 },
-                      ],
-                      default: 0,
-                    },
-                  },
+                  case: { $and: [{ $eq: ['$category', 'general(individual)'] }, { $eq: ['$rank', '1st'] }] },
+                  then: 8,
                 },
                 {
-                  case: { $eq: ['$category', 'general(group)'] },
-                  then: {
-                    $switch: {
-                      branches: [
-                        { case: { $eq: ['$rank', '1st'] }, then: 15 },
-                        { case: { $eq: ['$rank', '2nd'] }, then: 10 },
-                        { case: { $eq: ['$rank', '3rd'] }, then: 5 },
-                      ],
-                      default: 0,
-                    },
-                  },
+                  case: { $and: [{ $eq: ['$category', 'general(individual)'] }, { $eq: ['$rank', '2nd'] }] },
+                  then: 5,
                 },
-                // Default case for other categories (subjunior, junior, senior)
                 {
-                  case: { $ne: ['$category', null] },
-                  then: {
-                    $switch: {
-                      branches: [
-                        { case: { $eq: ['$rank', '1st'] }, then: 5 },
-                        { case: { $eq: ['$rank', '2nd'] }, then: 3 },
-                        { case: { $eq: ['$rank', '3rd'] }, then: 1 },
-                      ],
-                      default: 0,
-                    },
-                  },
+                  case: { $and: [{ $eq: ['$category', 'general(individual)'] }, { $eq: ['$rank', '3rd'] }] },
+                  then: 2,
+                },
+                {
+                  case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', '1st'] }] },
+                  then: 15,
+                },
+                {
+                  case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', '2nd'] }] },
+                  then: 10,
+                },
+                {
+                  case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', '3rd'] }] },
+                  then: 5,
+                },
+                {
+                  case: { $eq: ['$rank', '1st'] },
+                  then: 5,
+                },
+                {
+                  case: { $eq: ['$rank', '2nd'] },
+                  then: 3,
+                },
+                {
+                  case: { $eq: ['$rank', '3rd'] },
+                  then: 1,
                 },
               ],
               default: 0,

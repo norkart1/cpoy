@@ -631,11 +631,13 @@ export default function HomePage() {
                  <Users className="w-5 h-5" />
                  Team Panel
               </button>
-             </Link>
+             </Link >
+             <Link href="/results">
               <button className="group relative inline-flex items-center gap-2 border-2 border-gray-600 text-gray-800 px-8 py-3 rounded-lg font-semibold font-geist-sans hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-105">
                 <Trophy className="w-5 h-5" />
                 View Results
               </button>
+             </Link>
             </div>
 
             {/* Scroll indicator */}
