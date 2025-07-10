@@ -12,7 +12,6 @@ import {
   Legend,
 } from "chart.js";
 import { Search } from "lucide-react";
-import Link from "next/link";
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -25,7 +24,6 @@ export default function ResultPage() {
     senior: [],
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [contestantScores, setContestantScores] = useState(null);
 
   useEffect(() => {
     // Fetch team total scores
@@ -75,29 +73,13 @@ export default function ResultPage() {
       });
   }, []);
 
-  // Handle search by contestantNumber
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    try {
-      const res = await fetch(
-        `/api/contestant-scores?contestantNumber=${searchQuery}`
-      );
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      if (data.success) {
-        const rankedScores = data.scores.filter((score) =>
-          ["1st", "2nd", "3rd"].includes(score.rank)
-        );
-        setContestantScores(rankedScores);
-      } else {
-        setContestantScores(null);
-        console.error("Search failed:", data.message);
-      }
-    } catch (err) {
-      setContestantScores(null);
-      fetch(`/api/contestant-scores?contestantNumber=${searchQuery}`).then((res) =>
-        console.log("Raw response (search):", res)
-      );
+  // Handle search and redirect
+  const handleCheck = (e) => {
+    e.preventDefault();
+    if (searchQuery && !isNaN(searchQuery)) {
+      window.location.href = `/contestant-result-table?contestantNumber=${searchQuery}`;
+    } else {
+      console.error("Please enter a valid contestant number");
     }
   };
 
@@ -125,12 +107,21 @@ export default function ResultPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-       <div className="text-center">
-        <Link href="/contestant-result">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Check Your Result
-          </button>
-        </Link>
+      {/* Contestant Number Input and Check Button */}
+      <div className="max-w-md mx-auto mb-6 bg-white p-6 rounded-lg shadow-md flex items-center gap-4">
+        <input
+          type="number"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Enter Contestant Number"
+          className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={handleCheck}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200"
+        >
+          Check Result
+        </button>
       </div>
 
       {/* Top 3 Teams Graph */}
@@ -182,111 +173,6 @@ export default function ResultPage() {
           </div>
         ))}
       </div>
-
-      {/* Contestant Search */}
-      {/* <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4">Search Contestant Results</h2>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Enter Contestant Number"
-            className="flex-1 p-2 border rounded"
-          />
-          <button
-            onClick={handleSearch}
-            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-          >
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
-        {contestantScores && contestantScores.length > 0 ? (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Ranked Scores:</h3>
-            {contestantScores.reduce(
-              (acc, score) => {
-                const section = score.stage === "offstage" ? acc.offstage : acc.stage;
-                section.push(
-                  <div
-                    key={score._id}
-                    className="p-2 bg-gray-50 rounded flex justify-between"
-                  >
-                    <span>{score.itemName} (Rank: {score.rank})</span>
-                    <span className="font-bold">{score.score}</span>
-                  </div>
-                );
-                return acc;
-              },
-              { stage: [], offstage: [] }
-            ).stage.length > 0 && (
-              <div>
-                <h4 className="text-md font-medium">Stage Results:</h4>
-                {[...new Set(
-                  contestantScores
-                    .filter((s) => s.stage === "stage")
-                    .map((s) => s.itemName)
-                )].map((itemName) => (
-                  <div key={itemName}>
-                    {contestantScores
-                      .filter((s) => s.stage === "stage" && s.itemName === itemName)
-                      .map((s) => (
-                        <div
-                          key={s._id}
-                          className="p-2 bg-gray-50 rounded flex justify-between"
-                        >
-                          <span>{s.itemName} (Rank: {s.rank})</span>
-                          <span className="font-bold">{s.score}</span>
-                        </div>
-                      ))}
-                  </div>
-                ))}
-              </div>
-            )}
-            {contestantScores.reduce(
-              (acc, score) => {
-                const section = score.stage === "offstage" ? acc.offstage : acc.stage;
-                section.push(
-                  <div
-                    key={score._id}
-                    className="p-2 bg-gray-50 rounded flex justify-between"
-                  >
-                    <span>{score.itemName} (Rank: {score.rank})</span>
-                    <span className="font-bold">{score.score}</span>
-                  </div>
-                );
-                return acc;
-              },
-              { stage: [], offstage: [] }
-            ).offstage.length > 0 && (
-              <div>
-                <h4 className="text-md font-medium">Offstage Results:</h4>
-                {[...new Set(
-                  contestantScores
-                    .filter((s) => s.stage === "offstage")
-                    .map((s) => s.itemName)
-                )].map((itemName) => (
-                  <div key={itemName}>
-                    {contestantScores
-                      .filter((s) => s.stage === "offstage" && s.itemName === itemName)
-                      .map((s) => (
-                        <div
-                          key={s._id}
-                          className="p-2 bg-gray-50 rounded flex justify-between"
-                        >
-                          <span>{s.itemName} (Rank: {s.rank})</span>
-                          <span className="font-bold">{s.score}</span>
-                        </div>
-                      ))}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : contestantScores === null && searchQuery ? (
-          <p className="text-center text-red-500">No results found for {searchQuery}</p>
-        ) : null}
-      </div> */}
     </div>
   );
 }
