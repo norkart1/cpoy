@@ -339,9 +339,8 @@ export default function ResultPage() {
               {teamScores.map((group, index) => (
                 <div
                   key={group.teamName}
-                  className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 hover:scale-105 animate-slide-in ${
-                    index === 0 ? 'bg-black text-white shadow-2xl' : 'bg-gray-50 border-2 border-gray-200 hover:border-black'
-                  }`}
+                  className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 hover:scale-105 animate-slide-in ${index === 0 ? 'bg-black text-white shadow-2xl' : 'bg-gray-50 border-2 border-gray-200 hover:border-black'
+                    }`}
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
                   {index === 0 && (
@@ -350,9 +349,8 @@ export default function ResultPage() {
                     </div>
                   )}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
-                      index === 0 ? 'bg-white text-black' : 'bg-black text-white'
-                    }`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${index === 0 ? 'bg-white text-black' : 'bg-black text-white'
+                      }`}>
                       {index + 1}
                     </div>
                     <div>
@@ -397,11 +395,10 @@ export default function ResultPage() {
                     {performers.length > 0 ? (
                       performers.map((performer, index) => (
                         <div key={performer.contestantNumber} className="flex items-center gap-4">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                            index === 0 ? 'bg-black text-white trophy-gold' :
-                            index === 1 ? 'bg-gray-200 text-black trophy-silver' :
-                            'bg-gray-200 text-black trophy-bronze'
-                          }`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${index === 0 ? 'bg-black text-white trophy-gold' :
+                              index === 1 ? 'bg-gray-200 text-black trophy-silver' :
+                                'bg-gray-200 text-black trophy-bronze'
+                            }`}>
                             {index + 1}
                           </div>
                           <div className="flex-1">
@@ -435,8 +432,9 @@ export default function ResultPage() {
             Celebrating academic excellence and teamwork.
           </p>
           <div className="text-xs sm:text-sm text-gray-500 font-geist-mono">
-            Results generated on {new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+            Held from 13th to 16th July 2025
           </div>
+
         </div>
       </div>
     </div>
