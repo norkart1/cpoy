@@ -379,6 +379,7 @@ import {
   GraduationCap,
   Target
 } from 'lucide-react';
+import Sidebar from "@/components/sidebar";
 
 // Sample team data (replace with MongoDB query if needed)
 // const teams = [
@@ -558,7 +559,9 @@ export default function HomePage() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-white">
+      <div className="flex min-h-screen bg-white">
+        <Sidebar />
+              <main className="flex-1 md:p-10 pb-36">
         {/* Hero Section */}
         <div className="min-h-screen bg-white text-black relative overflow-hidden" role="banner" aria-label="Hero Section">
           {/* Background Image */}
@@ -852,6 +855,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+        </main>
       </div>
     </>
   );

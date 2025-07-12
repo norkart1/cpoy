@@ -357,13 +357,13 @@ export default function ContestantResultTable() {
               <Star className="w-4 h-4" />
               Contestant Results
             </div>
-            <h1 className="text-5xl sm:text-7xl font-black leading-none mb-4 sm:mb-6 tracking-tight font-geist-sans">
-              DARS
+            {/* <h1 className="text-5xl sm:text-7xl font-black leading-none mb-4 sm:mb-6 tracking-tight font-geist-sans">
+              100
               <br />
-              <span className="text-outline">FEST</span>
-            </h1>
+              <span className="text-outline">100</span>
+            </h1> */}
             <div className="text-lg sm:text-xl font-light tracking-wide mb-6 sm:mb-8 font-geist-mono">
-              Alathurpadi • 2025
+              Alathurpadi Dars Fest 2025
             </div>
             {contestant && (
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto mb-8 sm:mb-12 leading-relaxed font-geist-mono">
@@ -374,7 +374,7 @@ export default function ContestantResultTable() {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-16">
             <button
-              onClick={downloadPDF}
+              // onClick={downloadPDF}
               className="group bg-black text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium font-geist-sans hover:bg-gray-800 transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl"
             >
               <Download className="w-4 sm:w-5 h-4 sm:h-5 group-hover:scale-110 transition-transform" />
@@ -384,7 +384,7 @@ export default function ContestantResultTable() {
               href="/results"
               className="border-2 border-black text-black px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium font-geist-sans hover:bg-black hover:text-white transition-all duration-300 flex items-center gap-2 sm:gap-3"
             >
-              Back to Rankings
+              Back to Results
               <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5" />
             </a>
           </div>
