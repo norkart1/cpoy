@@ -1,11 +1,24 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Plus, Trash2, Share2, Edit3, Users, Award, Calendar, Tag, Eye, Clock, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import AdminSidebar from '@/components/adminSidebar';
-import toast, { Toaster } from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Plus,
+  Trash2,
+  Share2,
+  Edit3,
+  Users,
+  Award,
+  Calendar,
+  Tag,
+  Eye,
+  Clock,
+  Search,
+  Key,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import AdminSidebar from "@/components/adminSidebar";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AddItem() {
   const [formItems, setFormItems] = useState([]);
@@ -13,46 +26,44 @@ export default function AddItem() {
   const [juries, setJuries] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [showJuryModal, setShowJuryModal] = useState(false);
-  const [itemSchedules, setItemSchedules] = useState({}); // Store schedules per item
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [stageFilter, setStageFilter] = useState('all'); // New state for stage filter
+  const [itemSchedules, setItemSchedules] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [stageFilter, setStageFilter] = useState("all");
   const router = useRouter();
 
-  const validDays = ['തിങ്കൾ', 'ചൊവ്വ', 'ബുധൻ', 'വ്യാഴം', 'വെള്ളി', 'ശനി', 'ഞായർ'];
+  const validDays = ["തിങ്കൾ", "ചൊവ്വ", "ബുധൻ", "വ്യാഴം", "വെള്ളി", "ശനി", "ഞായർ"];
 
   useEffect(() => {
     const fetchCreatedItems = async () => {
       try {
-        // Load filter states from local storage
-        const savedSearchQuery = localStorage.getItem('itemSearchQuery') || '';
-        const savedCategoryFilter = localStorage.getItem('itemCategoryFilter') || 'all';
-        const savedStageFilter = localStorage.getItem('itemStageFilter') || 'all'; // Load stage filter
+        const savedSearchQuery = localStorage.getItem("itemSearchQuery") || "";
+        const savedCategoryFilter = localStorage.getItem("itemCategoryFilter") || "all";
+        const savedStageFilter = localStorage.getItem("itemStageFilter") || "all";
         setSearchQuery(savedSearchQuery);
         setCategoryFilter(savedCategoryFilter);
-        setStageFilter(savedStageFilter); // Set stage filter
+        setStageFilter(savedStageFilter);
 
-        const res = await fetch('/api/admin/items/list');
+        const res = await fetch("/api/admin/items/list");
         const data = await res.json();
         if (data.success) {
           setCreatedItems(data.items);
-          // Initialize schedules
           const schedules = data.items.reduce((acc, item) => {
             acc[item._id] = {
-              date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
-              day: item.day || '',
-              startTime: item.timeRange?.start || '',
-              endTime: item.timeRange?.end || '',
+              date: item.date ? new Date(item.date).toISOString().split("T")[0] : "",
+              day: item.day || "",
+              startTime: item.timeRange?.start || "",
+              endTime: item.timeRange?.end || "",
             };
             return acc;
           }, {});
           setItemSchedules(schedules);
         } else {
-          toast.error('Failed to fetch items.');
+          toast.error("Failed to fetch items.");
         }
       } catch (error) {
-        console.error('Failed to fetch items:', error);
-        toast.error('Server error fetching items.');
+        console.error("Failed to fetch items:", error);
+        toast.error("Server error fetching items.");
       }
     };
 
@@ -61,16 +72,15 @@ export default function AddItem() {
   }, []);
 
   useEffect(() => {
-    // Save filter states to local storage
-    localStorage.setItem('itemSearchQuery', searchQuery);
-    localStorage.setItem('itemCategoryFilter', categoryFilter);
-    localStorage.setItem('itemStageFilter', stageFilter); // Save stage filter
+    localStorage.setItem("itemSearchQuery", searchQuery);
+    localStorage.setItem("itemCategoryFilter", categoryFilter);
+    localStorage.setItem("itemStageFilter", stageFilter);
   }, [searchQuery, categoryFilter, stageFilter]);
 
   const addForm = () => {
     setFormItems((prev) => [
       ...prev,
-      { id: Date.now(), name: '', category: '', type: '', stage: '' },
+      { id: Date.now(), name: "", category: "", type: "", stage: "" },
     ]);
   };
 
@@ -84,30 +94,35 @@ export default function AddItem() {
     const { name, category, type, stage } = item;
 
     if (!name || !category || !type || !stage) {
-      toast.error('Please fill all required fields.');
+      toast.error("Please fill all required fields.");
       return;
     }
 
     try {
-      const response = await axios.post('/api/admin/items/add', item);
+      const response = await axios.post("/api/admin/items/add", item);
       if (response.data.success) {
-        toast.success('Item added successfully!');
+        toast.success("Item added successfully!");
         setCreatedItems((prev) => [
           ...prev,
-          { ...item, _id: response.data.itemId || Date.now().toString() },
+          {
+            ...item,
+            _id: response.data.itemId || Date.now().toString(),
+            published: false,
+            codeLetter: [],
+          },
         ]);
         setFormItems((prev) => prev.filter((i) => i.id !== item.id));
       } else {
-        toast.error(response.data.message || 'Failed to add item.');
+        toast.error(response.data.message || "Failed to add item.");
       }
     } catch (error) {
-      console.error('Axios error:', error);
-      toast.error('Server error. Try again.');
+      console.error("Axios error:", error);
+      toast.error("Server error. Try again.");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!confirm("Are you sure you want to delete this item?")) return;
 
     try {
       const response = await axios.post(`/api/admin/items/${id}/delete`);
@@ -118,51 +133,50 @@ export default function AddItem() {
           delete newSchedules[id];
           return newSchedules;
         });
-        toast.success('Item deleted successfully.');
+        toast.success("Item deleted successfully.");
       } else {
-        toast.error(response.data.message || 'Failed to delete item.');
+        toast.error(response.data.message || "Failed to delete item.");
       }
     } catch (error) {
-      console.error('Axios error:', error);
-      toast.error('Server error. Try again.');
+      console.error("Axios error:", error);
+      toast.error("Server error. Try again.");
     }
   };
 
   const handleShare = async (itemId) => {
     try {
-      const res = await axios.get('/api/admin/juries/list');
+      const res = await axios.get("/api/admin/juries/list");
       if (res.data.success) {
         setJuries(res.data.juries);
         setSelectedItemId(itemId);
         setShowJuryModal(true);
       } else {
-        toast.error(res.data.message || 'Failed to fetch juries.');
+        toast.error(res.data.message || "Failed to fetch juries.");
       }
     } catch (error) {
-      console.error('Error fetching juries:', error);
-      toast.error('Server error fetching juries.');
+      console.error("Error fetching juries:", error);
+      toast.error("Server error fetching juries.");
     }
   };
 
   const shareWithJury = async (itemId, juryId) => {
     try {
-      const res = await axios.post('/api/admin/juries/assign', { itemId, juryId });
+      const res = await axios.post("/api/admin/juries/assign", { itemId, juryId });
       if (res.data.success) {
-        toast.success('Item successfully assigned to jury!');
+        toast.success("Item successfully assigned to jury!");
         setShowJuryModal(false);
       } else {
-        toast.error(res.data.message || 'Failed to assign item.');
+        toast.error(res.data.message || "Failed to assign item.");
       }
     } catch (error) {
-      console.error('Error assigning jury:', error);
-      toast.error('Server error while assigning jury.');
+      console.error("Error assigning jury:", error);
+      toast.error("Server error while assigning jury.");
     }
   };
 
   const handleScheduleChange = (itemId, field, value) => {
-    console.log('Updating schedule for itemId:', itemId, 'field:', field, 'value:', value);
-    if (field === 'day' && value && !validDays.includes(value)) {
-      toast.error('Invalid day. Please select a valid weekday.');
+    if (field === "day" && value && !validDays.includes(value)) {
+      toast.error("Invalid day. Please select a valid weekday.");
       return;
     }
     setItemSchedules((prev) => ({
@@ -175,15 +189,14 @@ export default function AddItem() {
   };
 
   const handleSaveSchedule = async (itemId) => {
-    console.log('Saving schedule for itemId:', itemId, 'schedule:', itemSchedules[itemId]);
     const schedule = itemSchedules[itemId];
     if (!schedule?.date || !schedule?.day || !schedule?.startTime || !schedule?.endTime) {
-      toast.error('All schedule fields are required.');
+      toast.error("All schedule fields are required.");
       return;
     }
 
     if (!validDays.includes(schedule.day)) {
-      toast.error('Invalid day. Please select a valid weekday (e.g., Monday).');
+      toast.error("Invalid day. Please select a valid weekday.");
       return;
     }
 
@@ -195,23 +208,77 @@ export default function AddItem() {
         endTime: schedule.endTime,
       });
       if (response.data.success) {
-        toast.success('Schedule saved successfully!');
+        toast.success("Schedule saved successfully!");
       } else {
-        toast.error(response.data.message || 'Failed to save schedule.');
+        toast.error(response.data.message || "Failed to save schedule.");
       }
     } catch (error) {
-      console.error('Save schedule error:', error);
-      toast.error('Server error. Please try again.');
+      console.error("Save schedule error:", error);
+      toast.error("Server error. Please try again.");
+    }
+  };
+
+  const handleTogglePublish = async (itemId, currentStatus) => {
+    if (
+      !confirm(
+        `Are you sure you want to ${currentStatus ? "unpublish" : "publish"} this item?`
+      )
+    )
+      return;
+
+    try {
+      const response = await axios.patch("/api/admin/items/publish", { itemId });
+      if (response.data.success) {
+        toast.success(
+          `Item ${response.data.published ? "published" : "unpublished"} successfully!`
+        );
+        setCreatedItems((prev) =>
+          prev.map((item) =>
+            item._id === itemId ? { ...item, published: response.data.published } : item
+          )
+        );
+      } else {
+        toast.error(response.data.message || "Failed to update publish status.");
+      }
+    } catch (error) {
+      console.error("Error toggling publish status:", error);
+      toast.error("Server error. Try again.");
+    }
+  };
+
+  const handleGenerateCodeLetter = async (itemId) => {
+    if (
+      !confirm(
+        "Are you sure you want to generate code letters for this item? This will overwrite existing code letters."
+      )
+    )
+      return;
+
+    try {
+      const response = await axios.post("/api/admin/items/codeletter", { itemId });
+      if (response.data.success) {
+        toast.success("Code letters generated successfully!");
+        setCreatedItems((prev) =>
+          prev.map((item) =>
+            item._id === itemId ? { ...item, codeLetter: response.data.codeLetter } : item
+          )
+        );
+      } else {
+        toast.error(response.data.message || "Failed to generate code letters.");
+      }
+    } catch (error) {
+      console.error("Error generating code letters:", error);
+      toast.error("Server error. Try again.");
     }
   };
 
   const getCategoryIcon = (category) => {
     switch (category) {
-      case 'senior':
+      case "senior":
         return <Award className="w-4 h-4" />;
-      case 'junior':
+      case "junior":
         return <Users className="w-4 h-4" />;
-      case 'subjunior':
+      case "subjunior":
         return <Tag className="w-4 h-4" />;
       default:
         return <Calendar className="w-4 h-4" />;
@@ -220,27 +287,31 @@ export default function AddItem() {
 
   const getCategoryColor = (category) => {
     switch (category) {
-      case 'senior':
-        return 'bg-gradient-to-r from-purple-500 to-indigo-600';
-      case 'junior':
-        return 'bg-gradient-to-r from-blue-500 to-cyan-600';
-      case 'subjunior':
-        return 'bg-gradient-to-r from-green-500 to-teal-600';
-      case 'general(individual)':
-        return 'bg-gradient-to-r from-orange-500 to-red-600';
-      case 'general(group)':
-        return 'bg-gradient-to-r from-pink-500 to-rose-600';
+      case "senior":
+        return "bg-gradient-to-r from-purple-500 to-indigo-600";
+      case "junior":
+        return "bg-gradient-to-r from-blue-500 to-cyan-600";
+      case "subjunior":
+        return "bg-gradient-to-r from-green-500 to-teal-600";
+      case "general(individual)":
+        return "bg-gradient-to-r from-orange-500 to-red-600";
+      case "general(group)":
+        return "bg-gradient-to-r from-pink-500 to-rose-600";
       default:
-        return 'bg-gradient-to-r from-gray-500 to-slate-600';
+        return "bg-gradient-to-r from-gray-500 to-slate-600";
     }
   };
 
-  const categories = ['all', ...new Set(createdItems.map(item => item.category))];
+  const categories = [
+    "all",
+    ...new Set(createdItems.map((item) => item.category)),
+  ];
 
-  const filteredItems = createdItems.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (categoryFilter === 'all' || item.category === categoryFilter) &&
-    (stageFilter === 'all' || item.stage === stageFilter) // Apply stage filter
+  const filteredItems = createdItems.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (categoryFilter === "all" || item.category === categoryFilter) &&
+      (stageFilter === "all" || item.stage === stageFilter)
   );
 
   return (
@@ -273,7 +344,9 @@ export default function AddItem() {
           {/* Form Section */}
           {formItems.length > 0 && (
             <div className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New Competition</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Create New Competition
+              </h2>
               <div className="space-y-6">
                 {formItems.map((item) => (
                   <div
@@ -282,28 +355,34 @@ export default function AddItem() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700">Competition Name</label>
+                        <label className="text-sm font-semibold text-gray-700">
+                          Competition Name
+                        </label>
                         <input
                           type="text"
                           placeholder="Enter competition name"
                           value={item.name}
-                          onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                          onChange={(e) => handleChange(item.id, "name", e.target.value)}
                           className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm text-gray-700"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700">Category</label>
+                        <label className="text-sm font-semibold text-gray-700">
+                          Category
+                        </label>
                         <select
                           value={item.category}
-                          onChange={(e) => handleChange(item.id, 'category', e.target.value)}
+                          onChange={(e) => handleChange(item.id, "category", e.target.value)}
                           className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm text-gray-700"
                         >
                           <option value="">Select Category</option>
                           <option value="subjunior">Sub Junior</option>
                           <option value="junior">Junior</option>
                           <option value="senior">Senior</option>
-                          <option value="general(individual)">General (Individual)</option>
+                          <option value="general(individual)">
+                            General (Individual)
+                          </option>
                           <option value="general(group)">General (Group)</option>
                         </select>
                       </div>
@@ -312,7 +391,7 @@ export default function AddItem() {
                         <label className="text-sm font-semibold text-gray-700">Type</label>
                         <select
                           value={item.type}
-                          onChange={(e) => handleChange(item.id, 'type', e.target.value)}
+                          onChange={(e) => handleChange(item.id, "type", e.target.value)}
                           className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm text-gray-700"
                         >
                           <option value="">Select Type</option>
@@ -325,7 +404,7 @@ export default function AddItem() {
                         <label className="text-sm font-semibold text-gray-700">Stage</label>
                         <select
                           value={item.stage}
-                          onChange={(e) => handleChange(item.id, 'stage', e.target.value)}
+                          onChange={(e) => handleChange(item.id, "stage", e.target.value)}
                           className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm text-gray-700"
                         >
                           <option value="">Select Stage</option>
@@ -360,7 +439,6 @@ export default function AddItem() {
 
             {/* Search and Category Filter */}
             <div className="mb-8 flex flex-col sm:flex-row gap-4 sm:items-center">
-              {/* Search Input */}
               <div className="relative w-full sm:flex-1">
                 <input
                   type="text"
@@ -373,7 +451,6 @@ export default function AddItem() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
               </div>
 
-              {/* Category Select */}
               <div className="relative w-full sm:w-56">
                 <select
                   value={categoryFilter}
@@ -382,16 +459,17 @@ export default function AddItem() {
                   aria-label="Filter competitions by category"
                 >
                   <option value="all">All Categories</option>
-                  {categories.filter(cat => cat !== 'all').map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.replace(/\(.*\)/, '').replace(/([a-z])([A-Z])/g, '$1 $2')}
-                    </option>
-                  ))}
+                  {categories
+                    .filter((cat) => cat !== "all")
+                    .map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat.replace(/\(.*\)/, "").replace(/([a-z])([A-Z])/g, "$1 $2")}
+                      </option>
+                    ))}
                 </select>
                 <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
               </div>
 
-              {/* Stage Select */}
               <div className="relative w-full sm:w-56">
                 <select
                   value={stageFilter}
@@ -412,19 +490,25 @@ export default function AddItem() {
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="w-12 h-12 text-indigo-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">No competitions found</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  No competitions found
+                </h3>
                 <p className="text-gray-600">Try adjusting your search or category filter</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredItems.map((item) => (
                   <div
                     key={item._id}
-                    className="group bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20 hover:shadow-2xl hover:scale-105 transition-all duration-300 flex"
+                    className="group bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between min-h-[300px]"
                   >
-                    <div className="flex-1">
+                    <div>
                       <div className="flex items-start justify-between mb-4">
-                        <div className={`p-3 rounded-2xl ${getCategoryColor(item.category)} shadow-lg`}>
+                        <div
+                          className={`p-3 rounded-2xl ${getCategoryColor(
+                            item.category
+                          )} shadow-lg`}
+                        >
                           {getCategoryIcon(item.category)}
                           <div className="text-white text-xs font-semibold mt-1">
                             {item.category.toUpperCase()}
@@ -435,33 +519,75 @@ export default function AddItem() {
                             {item.type}
                           </span>
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${item.stage === 'stage' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-                              }`}
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              item.stage === "stage"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-orange-100 text-orange-700"
+                            }`}
                           >
-                            {item.stage === 'stage' ? 'On Stage' : 'Off Stage'}
+                            {item.stage === "stage" ? "On Stage" : "Off Stage"}
                           </span>
+                          <label className="flex items-center gap-2 ml-2">
+                            <input
+                              type="checkbox"
+                              checked={item.published}
+                              onChange={() =>
+                                handleTogglePublish(item._id, item.published)
+                              }
+                              className="form-checkbox h-5 w-5 text-indigo-600"
+                              aria-label={`Toggle publish status for item ${item.name}`}
+                            />
+                            <span className="text-xs font-semibold text-gray-600">
+                              {item.published ? "Published" : "Unpublished"}
+                            </span>
+                          </label>
                         </div>
                       </div>
 
                       <div className="flex flex-col md:flex-row gap-6 p-4 rounded-xl bg-white/50 shadow-sm border border-gray-200 capitalize">
-                        {/* Left Column: Item Info */}
                         <div className="flex-1">
                           <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
                             {item.name}
                           </h3>
                           <p className="text-gray-600 text-sm">
-                            {item.category.replace(/\(.*\)/, '').replace(/([a-z])([A-Z])/g, '$1 $2')} • Type {item.type}
+                            {item.category
+                              .replace(/\(.*\)/, "")
+                              .replace(/([a-z])([A-Z])/g, "$1 $2")}{" "}
+                            • Type {item.type}
                           </p>
+                          {item.codeLetter?.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-sm font-semibold text-gray-700">
+                                Code Letters:
+                              </p>
+                              <select
+                                className="w-full p-2 mt-1 border border-gray-300 rounded-md text-sm text-gray-700"
+                                aria-label={`Select code letter for item ${item.name}`}
+                              >
+                                <option value="">Select Code Letter</option>
+                                {item.codeLetter.map((cl) => (
+                                  <option
+                                    key={cl.contestantId}
+                                    value={cl.codeLetter}
+                                  >
+                                    Contestant ID: {cl.contestantId}, Code:{" "}
+                                    {cl.codeLetter}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Right Column: Schedule Form */}
                         <div className="flex-1 flex flex-col gap-3">
                           <div className="relative">
                             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-500" />
                             <input
                               type="date"
-                              value={itemSchedules[item._id]?.date || ''}
-                              onChange={(e) => handleScheduleChange(item._id, 'date', e.target.value)}
+                              value={itemSchedules[item._id]?.date || ""}
+                              onChange={(e) =>
+                                handleScheduleChange(item._id, "date", e.target.value)
+                              }
                               className="w-full pl-10 pr-3 py-2 bg-white/10 border border-indigo-200/30 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400/50 outline-none transition-all text-sm"
                               aria-label={`Select date for item ${item.name}`}
                             />
@@ -469,8 +595,10 @@ export default function AddItem() {
 
                           <div className="relative">
                             <select
-                              value={itemSchedules[item._id]?.day || ''}
-                              onChange={(e) => handleScheduleChange(item._id, 'day', e.target.value)}
+                              value={itemSchedules[item._id]?.day || ""}
+                              onChange={(e) =>
+                                handleScheduleChange(item._id, "day", e.target.value)
+                              }
                               className="w-full pl-3 pr-3 py-2 bg-white/10 border border-indigo-200/30 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400/50 outline-none transition-all text-sm"
                               aria-label={`Select day for item ${item.name}`}
                             >
@@ -488,8 +616,14 @@ export default function AddItem() {
                               <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-500" />
                               <input
                                 type="time"
-                                value={itemSchedules[item._id]?.startTime || ''}
-                                onChange={(e) => handleScheduleChange(item._id, 'startTime', e.target.value)}
+                                value={itemSchedules[item._id]?.startTime || ""}
+                                onChange={(e) =>
+                                  handleScheduleChange(
+                                    item._id,
+                                    "startTime",
+                                    e.target.value
+                                  )
+                                }
                                 className="w-full pl-10 pr-3 py-2 bg-white/10 border border-indigo-200/30 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400/50 outline-none transition-all text-sm"
                                 aria-label={`Select start time for item ${item.name}`}
                               />
@@ -498,8 +632,14 @@ export default function AddItem() {
                               <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-500" />
                               <input
                                 type="time"
-                                value={itemSchedules[item._id]?.endTime || ''}
-                                onChange={(e) => handleScheduleChange(item._id, 'endTime', e.target.value)}
+                                value={itemSchedules[item._id]?.endTime || ""}
+                                onChange={(e) =>
+                                  handleScheduleChange(
+                                    item._id,
+                                    "endTime",
+                                    e.target.value
+                                  )
+                                }
                                 className="w-full pl-10 pr-3 py-2 bg-white/10 border border-indigo-200/30 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400/50 outline-none transition-all text-sm"
                                 aria-label={`Select end time for item ${item.name}`}
                               />
@@ -510,46 +650,56 @@ export default function AddItem() {
                             onClick={() => handleSaveSchedule(item._id)}
                             className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
                           >
-                            {itemSchedules[item._id]?.date ? 'Update' : 'Save'} Schedule
+                            {itemSchedules[item._id]?.date ? "Update" : "Save"} Schedule
                           </button>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => router.push(`/admin/items/${item._id}`)}
+                          className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          VIEW
+                        </button>
+
+                        <button
+                          onClick={() => router.push(`/admin/edit-item/${item._id}`)}
+                          className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                          Edit
+                        </button>
+
+                        {!item.codeLetter?.length > 0 && (
                           <button
-                            onClick={() => router.push(`/admin/items/${item._id}`)}
+                            onClick={() => handleGenerateCodeLetter(item._id)}
                             className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
                           >
-                            <Eye className="w-4 h-4" />
-                            VIEW
+                            <Key className="w-4 h-4" />
+                            GenerateCL
                           </button>
+                        )}
+                      </div>
 
-                          <button
-                            onClick={() => router.push(`/admin/edit-item/${item._id}`)}
-                            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Edit
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleShare(item._id)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
-                            title="Share with Jury"
-                          >
-                            <Share2 className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item._id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-                            title="Delete Competition"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleShare(item._id)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                          title="Share with Jury"
+                        >
+                          <Share2 className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                          title="Delete Competition"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -563,7 +713,9 @@ export default function AddItem() {
         {showJuryModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
             <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md shadow-2xl border border-white/20">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Assign to Jury Member</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Assign to Jury Member
+              </h3>
 
               {juries.length === 0 ? (
                 <p className="text-gray-600 text-center py-8">No jury members available.</p>
@@ -577,11 +729,16 @@ export default function AddItem() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                          {jury.username ? jury.username.split(' ').map((n) => n[0]).join('') : 'N/A'}
+                          {jury.username
+                            ? jury.username
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                            : "N/A"}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
-                            {jury.username || 'Unknown'}
+                            {jury.username || "Unknown"}
                           </p>
                         </div>
                       </div>

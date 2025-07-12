@@ -560,9 +560,10 @@ export default function JuryDashboard() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                  
                       <div>
-                        <div className="text-sm text-gray-500 font-geist-mono uppercase">Contestant</div>
-                        <div className="text-base font-semibold font-geist-sans text-black">#{contestant.contestantNumber || 'N/A'}</div>
+                        <div className="text-sm text-gray-500 font-geist-mono uppercase">code letter</div>
+                        <div className="text-base font-semibold font-geist-sans text-black">{(contestant.codeLetter || 'N/A').toUpperCase()}</div>
                       </div>
                       {ranks[contestant._id] && ['First', 'Second', 'Third'].includes(ranks[contestant._id]) && (
                         <span className="px-2 py-1 bg-black text-white text-xs font-semibold font-geist-sans rounded">

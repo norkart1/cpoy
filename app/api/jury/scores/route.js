@@ -1,15 +1,16 @@
-// /api/jury/scores
 import dbConnect from '@/lib/dbConnect';
 import Score from '@/models/score';
+import Item from '@/models/Item';
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const juryId = searchParams.get('juryId');
+  const contestantId = searchParams.get('contestantId');
+
   try {
     await dbConnect();
-    const { searchParams } = new URL(req.url);
-    const juryId = searchParams.get('juryId');
-    const contestantId = searchParams.get('contestantId');
 
     console.log('Fetching scores for:', { juryId, contestantId });
 
@@ -37,19 +38,25 @@ export async function GET(req) {
     if (juryId) query.jury = juryId;
     if (contestantId) query.contestant = contestantId;
 
+    // Fetch scores with related item field populated
     const scores = await Score.find(query)
-      .select('contestant score rank itemName category stage teamName')
+      .populate('item', 'published') // Only get `published` field from item
+      .select('contestant score rank itemName category stage teamName item')
       .sort({ score: -1 })
       .lean();
 
-    if (!scores.length) {
+    // Filter out scores where item.published !== true
+    const publishedScores = scores.filter((score) => score.item?.published === true);
+
+    if (!publishedScores.length) {
       return NextResponse.json(
-        { success: false, message: `No scores found for contestantId: ${contestantId || 'none'}` },
+        { success: false, message: `No published scores found` },
         { status: 404 }
       );
     }
 
-    const formattedScores = scores.map((score) => ({
+    // Format output
+    const formattedScores = publishedScores.map((score) => ({
       _id: score._id.toString(),
       contestant: score.contestant.toString(),
       score: score.score,
@@ -60,7 +67,7 @@ export async function GET(req) {
       teamName: score.teamName,
     }));
 
-    console.log('Fetched scores:', formattedScores);
+    console.log('Fetched published scores:', formattedScores);
 
     return NextResponse.json({ success: true, scores: formattedScores }, { status: 200 });
   } catch (error) {
@@ -72,8 +79,14 @@ export async function GET(req) {
       contestantId: searchParams.get('contestantId'),
     });
     return NextResponse.json(
-      { success: false, message: 'Server error fetching scores', error: error.message || 'Unknown error' },
+      {
+        success: false,
+        message: 'Server error fetching scores',
+        error: error.message || 'Unknown error',
+      },
       { status: 500 }
     );
   }
 }
+
+

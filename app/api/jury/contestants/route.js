@@ -58,25 +58,27 @@ export async function GET(req) {
     console.log('Item Model:', mongoose.models.Item);
     console.log('Contestant Model:', mongoose.models.Contestant);
 
-    // Fetch items with populated participants
+    // Fetch items with populated codeLetter contestantIds
     const items = await Item.find({ _id: { $in: validItemIds } })
-      .select('_id name')
+      .select('_id name codeLetter')
       .populate({
-        path: 'participants',
+        path: 'codeLetter.contestantId',
         select: '_id name contestantNumber groupName',
+        model: 'Contestant',
       });
 
     console.log('Fetched Items:', items);
 
-    // Map contestants with item details
+    // Map contestants with item details and codeLetter
     const contestants = items.flatMap((item) =>
-      (item.participants || []).map((participant) => ({
-        _id: participant._id,
-        name: participant.name || 'Unknown',
-        contestantNumber: participant.contestantNumber || 'N/A',
-        groupName: participant.groupName || 'N/A',
+      (item.codeLetter || []).map((codeEntry) => ({
+        _id: codeEntry.contestantId?._id,
+        name: codeEntry.contestantId?.name || 'Unknown',
+        contestantNumber: codeEntry.contestantId?.contestantNumber || 'N/A',
+        groupName: codeEntry.contestantId?.groupName || 'N/A',
         itemId: item._id,
         itemName: item.name || 'Unknown Competition',
+        codeLetter: codeEntry.codeLetter || 'N/A',
       }))
     );
 
@@ -91,4 +93,3 @@ export async function GET(req) {
     );
   }
 }
-

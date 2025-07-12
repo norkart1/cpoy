@@ -9,26 +9,34 @@ const ItemSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: ['subjunior', 'junior', 'senior', 'general(individual)', 'general(group)'],
-    required: true
+    required: true,
   },
   type: {
     type: String,
     enum: ['A', 'B'],
-    required: true
+    required: true,
   },
   stage: {
     type: String,
     enum: ['stage', 'offstage'],
-    required: true
+    required: true,
   },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contestant' }],
   isChecked: { type: Boolean, default: false },
-  date: { type: Date }, // Stores selected date
-  day: { type: String }, // Stores text day (e.g., "Monday")
+  date: { type: Date },
+  day: { type: String },
   timeRange: {
-    start: { type: String }, // e.g., "07:55"
-    end: { type: String }, // e.g., "08:00"
+    start: { type: String },
+    end: { type: String },
   },
+  published: {
+    type: Boolean,
+    default: false,
+  },
+  codeLetter: [{
+    contestantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contestant' },
+    codeLetter: { type: String, match: /^[a-xz]$/ }, // Single letter a-x or z (excludes 'y')
+  }],
 });
 
 const Item = mongoose.models.Item || mongoose.model('Item', ItemSchema);

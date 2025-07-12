@@ -1,4 +1,4 @@
-import dbConnect from '@/lib/dbConnect'; // Ensure connection
+import dbConnect from '@/lib/dbConnect';
 import Score from '@/models/score';
 import Contestant from '@/models/Contestant';
 import { NextResponse } from 'next/server';
@@ -35,10 +35,46 @@ export async function GET(req) {
       throw new Error('Score model is not available');
     }
 
-    // Fetch scores for the contestant using contestant._id
-    const scores = await Score.find({ contestant: contestant._id })
-      .populate('item', 'name stage')
-      .lean();
+    // Fetch scores with item lookup and filter for published items
+    const scores = await Score.aggregate([
+      {
+        $match: { contestant: contestant._id },
+      },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'item',
+          foreignField: '_id',
+          as: 'itemDetails',
+        },
+      },
+      {
+        $unwind: '$itemDetails',
+      },
+      {
+        $match: { 'itemDetails.published': true },
+      },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'item',
+          foreignField: '_id',
+          as: 'item',
+        },
+      },
+      {
+        $unwind: '$item',
+      },
+      {
+        $project: {
+          item: { name: '$item.name', stage: '$item.stage' },
+          rank: 1,
+          category: 1,
+          teamName: 1,
+          contestant: 1,
+        },
+      },
+    ]).lean();
 
     console.log('Fetched scores:', scores); // Debug: Log the results
 

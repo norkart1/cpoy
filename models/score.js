@@ -46,8 +46,12 @@ const ScoreSchema = new mongoose.Schema({
     required: true,
   },
   rank: {
-    type: String, // Removed enum to allow numeric ranks
+    type: String,
     required: false,
+  },
+  published: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,
