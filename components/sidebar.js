@@ -4,11 +4,12 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { motion } from 'framer-motion';
-import { Home, Users, User, FileText, Settings } from 'lucide-react';
+import { Home, Users, User, FileText, Settings, Gavel} from 'lucide-react';
 
 const menuItems = [
   { label: 'Home', href: '/', icon: Home },
   { label: 'Results', href: '/results', icon: FileText }, 
+  { label: 'Jury', href: '/jury/dashboard', icon: Gavel },
   { label: 'Team', href: '/team-panel', icon: Users },
   { label: 'Admin', href: '/admin', icon: Settings },     
 ];
