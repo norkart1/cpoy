@@ -68,7 +68,7 @@ export default function Sidebar() {
       </motion.div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden sm:block h-screen w-64 z-40 bg-gradient-to-b from-indigo-600 to-purple-700 text-white overflow-y-auto fixed top-0 left-0 lg:sticky lg:top-0 lg:shadow-lg">
+      <div className="hidden sm:block h-screen w-64 z-40 bg-black text-white overflow-y-auto fixed top-0 left-0 lg:sticky lg:top-0 lg:shadow-lg">
         {/* Logo */}
         <div className="p-6 border-b border-indigo-400 border-opacity-30">
           <div className="flex items-center">
