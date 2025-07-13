@@ -45,7 +45,8 @@ export default function ManageItemPage() {
     (p) =>
       p.name?.toLowerCase().includes(search.toLowerCase()) ||
       p.groupName?.toLowerCase().includes(search.toLowerCase()) ||
-      p.contestantNumber?.toLowerCase().includes(search.toLowerCase())
+      p.contestantNumber?.toLowerCase().includes(search.toLowerCase()) ||
+      p.codeLetter?.toLowerCase().includes(search.toLowerCase())
   );
 
   const downloadPDF = () => {
@@ -68,10 +69,11 @@ export default function ManageItemPage() {
     // Table
     autoTable(doc, {
       startY: 40,
-      head: [["#", "Contestant Number", "Name", "Group", "Category"]],
+      head: [["#", "Contestant Number", "Code Letter", "Name", "Group", "Category"]],
       body: filtered.map((p, index) => [
         index + 1,
         p.contestantNumber || "N/A",
+        p.codeLetter || "N/A",
         p.name || "Unknown",
         p.groupName || "N/A",
         p.category || "Unknown",
@@ -94,9 +96,10 @@ export default function ManageItemPage() {
       columnStyles: {
         0: { cellWidth: 10 }, // #
         1: { cellWidth: 40 }, // Contestant Number
-        2: { cellWidth: 50 }, // Name
-        3: { cellWidth: 50 }, // Group
-        4: { cellWidth: 40 }, // Category
+        2: { cellWidth: 20 }, // Code Letter
+        3: { cellWidth: 50 }, // Name
+        4: { cellWidth: 40 }, // Group
+        5: { cellWidth: 30 }, // Category
       },
     });
 
@@ -126,7 +129,7 @@ export default function ManageItemPage() {
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Search number, name, or group..."
+              placeholder="Search number, code, name, or group..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-indigo-300"
@@ -157,6 +160,7 @@ export default function ManageItemPage() {
                 <tr>
                   <th className="px-4 py-3 border-b">#</th>
                   <th className="px-4 py-3 border-b">Contestant Number</th>
+                  <th className="px-4 py-3 border-b">Code Letter</th>
                   <th className="px-4 py-3 border-b">Name</th>
                   <th className="px-4 py-3 border-b">Group</th>
                   <th className="px-4 py-3 border-b">Category</th>
@@ -167,6 +171,9 @@ export default function ManageItemPage() {
                   <tr key={p._id} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 border-b">{index + 1}</td>
                     <td className="px-4 py-3 border-b">{p.contestantNumber || "N/A"}</td>
+                 <td className="px-4 py-3 border-b">{p.codeLetter?.toUpperCase() || "N/A"}</td>
+
+
                     <td className="px-4 py-3 border-b font-medium">{p.name}</td>
                     <td className="px-4 py-3 border-b">{p.groupName || "N/A"}</td>
                     <td className="px-4 py-3 border-b capitalize">{p.category}</td>
