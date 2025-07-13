@@ -157,8 +157,6 @@
 //     </div>
 //   );
 // }
-
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -205,7 +203,7 @@ export default function ContestantResultTable() {
         setContestant(contestantData.contestant);
 
         // Fetch scores
-        const scoreRes = await fetch(`/api/jury/scores?contestantId=${contestantData.contestant._id}`);
+        const scoreRes = await fetch(`/api/jury/results/scores?contestantId=${contestantData.contestant._id}`);
         if (!scoreRes.ok) {
           const errData = await scoreRes.json();
           throw new Error(errData.message || `HTTP error: ${scoreRes.status}`);
@@ -217,31 +215,10 @@ export default function ContestantResultTable() {
           return;
         }
 
-        const calculatedScores = scoreData.scores.map((score) => {
-          let calculatedScore = 0;
-          if (score.rank && score.category) {
-            if (score.rank === 'First' && score.category === 'general(individual)') {
-              calculatedScore = 8;
-            } else if (score.rank === 'Second' && score.category === 'general(individual)') {
-              calculatedScore = 5;
-            } else if (score.rank === 'Third' && score.category === 'general(individual)') {
-              calculatedScore = 2;
-            } else if (score.rank === 'First' && score.category === 'general(group)') {
-              calculatedScore = 15;
-            } else if (score.rank === 'Second' && score.category === 'general(group)') {
-              calculatedScore = 10;
-            } else if (score.rank === 'Third' && score.category === 'general(group)') {
-              calculatedScore = 5;
-            } else if (score.rank === 'First') {
-              calculatedScore = 5;
-            } else if (score.rank === 'Second') {
-              calculatedScore = 3;
-            } else if (score.rank === 'Third') {
-              calculatedScore = 1;
-            }
-          }
-          return { ...score, calculatedScore };
-        });
+        const calculatedScores = scoreData.scores.map((score) => ({
+          ...score,
+          calculatedScore: score.calculatedScore || 0, // Use API-calculated score
+        }));
 
         const stageResults = calculatedScores.filter((s) => s.stage === 'stage');
         const offstageResults = calculatedScores.filter((s) => s.stage === 'offstage');
@@ -357,11 +334,6 @@ export default function ContestantResultTable() {
               <Star className="w-4 h-4" />
               Contestant Results
             </div>
-            {/* <h1 className="text-5xl sm:text-7xl font-black leading-none mb-4 sm:mb-6 tracking-tight font-geist-sans">
-              100
-              <br />
-              <span className="text-outline">100</span>
-            </h1> */}
             <div className="text-lg sm:text-xl font-light tracking-wide mb-6 sm:mb-8 font-geist-mono">
               Alathurpadi Dars Fest 2025
             </div>
@@ -374,7 +346,7 @@ export default function ContestantResultTable() {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-16">
             <button
-              // onClick={downloadPDF}
+              onClick={downloadPDF}
               className="group bg-black text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium font-geist-sans hover:bg-gray-800 transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl"
             >
               <Download className="w-4 sm:w-5 h-4 sm:h-5 group-hover:scale-110 transition-transform" />

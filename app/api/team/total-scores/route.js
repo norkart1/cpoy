@@ -98,8 +98,6 @@
 //     );
 //   }
 // }
-
-
 import dbConnect from '@/lib/dbConnect';
 import Score from '@/models/score';
 import { NextResponse } from 'next/server';
@@ -110,7 +108,20 @@ export async function GET(req) {
 
     // Build the aggregation pipeline
     const pipeline = [
-      // Match only documents with a rank (exclude unranked)
+      // Lookup to join with Item collection to check published status
+      {
+        $lookup: {
+          from: 'items', // Collection name for Item model
+          localField: 'item',
+          foreignField: '_id',
+          as: 'itemDetails',
+        },
+      },
+      // Unwind the itemDetails array (since lookup returns an array)
+      { $unwind: '$itemDetails' },
+      // Match only published items
+      { $match: { 'itemDetails.published': true } },
+      // Match only documents with a rank (First, Second, Third)
       { $match: { rank: { $in: ['First', 'Second', 'Third'] } } },
       // Project to calculate points based on rank and category
       {
@@ -133,15 +144,15 @@ export async function GET(req) {
                 },
                 {
                   case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', 'First'] }] },
-                  then: 15,
+                  then: 0,
                 },
                 {
                   case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', 'Second'] }] },
-                  then: 10,
+                  then: 0,
                 },
                 {
                   case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', 'Third'] }] },
-                  then: 5,
+                  then: 0,
                 },
                 {
                   case: { $eq: ['$rank', 'First'] },
@@ -182,7 +193,7 @@ export async function GET(req) {
 
     const scores = await Score.aggregate(pipeline);
 
-    console.log('Calculated team scores:', scores);
+    console.log('Calculated team scores from published items:', scores);
 
     return NextResponse.json(
       { success: true, scores },

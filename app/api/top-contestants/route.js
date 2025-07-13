@@ -1,4 +1,3 @@
-
 import dbConnect from '@/lib/dbConnect';
 import Score from '@/models/score';
 import Contestant from '@/models/Contestant';
@@ -27,7 +26,20 @@ export async function GET(req) {
           },
         },
       },
-      // Step 2: Join with Contestant
+      // Step 2: Join with Item to filter by published status
+      {
+        $lookup: {
+          from: 'items', // Collection name for Item model
+          localField: 'item',
+          foreignField: '_id',
+          as: 'itemDetails',
+        },
+      },
+      // Unwind the itemDetails array
+      { $unwind: '$itemDetails' },
+      // Filter for published items
+      { $match: { 'itemDetails.published': true } },
+      // Step 3: Join with Contestant
       {
         $lookup: {
           from: 'contestant',
@@ -46,15 +58,15 @@ export async function GET(req) {
           },
         },
       },
-      // Step 3: Filter documents with valid contestant details
+      // Step 4: Filter documents with valid contestant details
       {
         $match: {
           hasContestant: true,
         },
       },
-      // Step 4: Unwind contestantDetails
+      // Step 5: Unwind contestantDetails
       { $unwind: '$contestantDetails' },
-      // Step 5: Normalize category to lowercase
+      // Step 6: Normalize category to lowercase
       {
         $addFields: {
           contestantCategory: { $toLower: '$contestantDetails.category' },
@@ -70,7 +82,7 @@ export async function GET(req) {
           },
         },
       },
-      // Step 6: Group by contestant and calculate total points
+      // Step 7: Group by contestant and calculate total points
       {
         $group: {
           _id: '$contestant',
@@ -119,7 +131,7 @@ export async function GET(req) {
           },
         },
       },
-      // Step 7: Filter non-zero points
+      // Step 8: Filter non-zero points
       {
         $match: {
           totalPoints: { $ne: 0 },
@@ -138,7 +150,7 @@ export async function GET(req) {
           },
         },
       },
-      // Step 8: Facet by category
+      // Step 9: Facet by category
       {
         $facet: {
           subjunior: [
@@ -187,7 +199,16 @@ export async function GET(req) {
     ) {
       const debugCounts = await Score.aggregate([
         { $match: { rank: { $in: ['First', 'Second', 'Third'] }, category: { $ne: 'general(group)' } } },
-        { $group: { _id: null, rankedCount: { $sum: 1 } } },
+        {
+          $lookup: {
+            from: 'items',
+            localField: 'item',
+            foreignField: '_id',
+            as: 'itemDetails',
+          },
+        },
+        { $unwind: '$itemDetails' },
+        { $match: { 'itemDetails.published': true } },
         { $lookup: { from: 'contestant', localField: 'contestant', foreignField: '_id', as: 'contestantDetails' } },
         { $match: { contestantDetails: { $ne: [] } } },
         { $group: { _id: null, matchedContestantCount: { $sum: 1 } } },
@@ -196,7 +217,7 @@ export async function GET(req) {
       return NextResponse.json(
         {
           success: false,
-          message: 'No ranked contestants found',
+          message: 'No ranked contestants found for published items',
           subjunior: [],
           junior: [],
           senior: [],

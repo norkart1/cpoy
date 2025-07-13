@@ -1,4 +1,3 @@
-// /api/jury/scores
 import dbConnect from '@/lib/dbConnect';
 import Score from '@/models/score';
 import mongoose from 'mongoose';
@@ -49,16 +48,40 @@ export async function GET(req) {
       );
     }
 
-    const formattedScores = scores.map((score) => ({
-      _id: score._id.toString(),
-      contestant: score.contestant.toString(),
-      score: score.score,
-      rank: score.rank || null,
-      itemName: score.itemName,
-      category: score.category,
-      stage: score.stage,
-      teamName: score.teamName,
-    }));
+    // Filter for only First, Second, and Third ranks (assuming "Tired" was a typo for "Third")
+    const validRanks = ['First', 'Second', 'Third'];
+    const filteredScores = scores.filter((score) =>
+      score.rank && validRanks.includes(score.rank)
+    );
+
+    // Calculate points based on category and rank
+    const formattedScores = filteredScores.map((score) => {
+      let calculatedScore = 0;
+
+      if (score.category === 'general(individual)') {
+        if (score.rank === 'First') calculatedScore = 8;
+        else if (score.rank === 'Second') calculatedScore = 5;
+        else if (score.rank === 'Third') calculatedScore = 2;
+      } else if (score.category !== 'general(group)') {
+        if (score.rank === 'First') calculatedScore = 5;
+        else if (score.rank === 'Second') calculatedScore = 3;
+        else if (score.rank === 'Third') calculatedScore = 1;
+      } else {
+        calculatedScore = 0; // Set to 0 for general(group)
+      }
+
+      return {
+        _id: score._id.toString(),
+        contestant: score.contestant.toString(),
+        score: score.score,
+        rank: score.rank,
+        itemName: score.itemName,
+        category: score.category,
+        stage: score.stage,
+        teamName: score.teamName,
+        calculatedScore,
+      };
+    });
 
     console.log('Fetched scores:', formattedScores);
 
