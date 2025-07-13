@@ -32,18 +32,29 @@ export async function POST(req) {
       );
     }
 
-    // Valid code letters: a to x and z (exclude y)
-    const validLetters = 'abcdefghijklmnopqrstuvwxz'.split('');
+    // Valid single letters: a to x and z (exclude y)
+    const singleLetters = 'abcdefghijklmnopqrstuvwxz'.split('');
+    const maxSingleLetters = singleLetters.length; // 24 letters
 
     // Shuffle participants randomly
     const shuffledParticipants = [...item.participants].sort(() => Math.random() - 0.5);
 
-    // Assign code letters
+    // Generate code letters
     const codeLetterArray = shuffledParticipants.map((participant, index) => {
-      const letter = validLetters[index] || 'z'; // Fallback to 'z' if limit exceeded
+      let codeLetter;
+
+      if (index < maxSingleLetters) {
+        // Use single letter for the first 24 participants
+        codeLetter = singleLetters[index];
+      } else {
+        // Use two-character codes starting with 'a' for additional participants
+        const number = index - maxSingleLetters + 1; // Start with a1 (index 24 -> 1)
+        codeLetter = `a${number}`;
+      }
+
       return {
         contestantId: participant._id,
-        codeLetter: letter,
+        codeLetter: codeLetter, // Store as lowercase to match schema
       };
     });
 
@@ -51,15 +62,21 @@ export async function POST(req) {
     item.codeLetter = codeLetterArray;
     await item.save();
 
-    return new Response(JSON.stringify({ success: true, codeLetter: item.codeLetter }), {
+    // Return uppercase code letters for consistency with UI
+    const responseCodeLetters = codeLetterArray.map((entry) => ({
+      contestantId: entry.contestantId,
+      codeLetter: entry.codeLetter.toUpperCase(),
+    }));
+
+    return new Response(JSON.stringify({ success: true, codeLetter: responseCodeLetters }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Error generating code letters:', error);
-    return new Response(JSON.stringify({ success: false, message: 'Server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+      });
+    } catch (error) {
+      console.error('Error generating code letters:', error);
+      return new Response(JSON.stringify({ success: false, message: 'Server error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
-}

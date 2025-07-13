@@ -73,7 +73,7 @@ export default function ManageItemPage() {
       body: filtered.map((p, index) => [
         index + 1,
         p.contestantNumber || "N/A",
-        p.codeLetter || "N/A",
+        p.codeLetter?.toUpperCase() || "N/A",
         p.name || "Unknown",
         p.groupName || "N/A",
         p.category || "Unknown",
