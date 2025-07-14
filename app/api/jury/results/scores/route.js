@@ -61,7 +61,7 @@ export async function GET(req) {
       if (score.category === 'general(individual)') {
         if (score.rank === 'First') calculatedScore = 8;
         else if (score.rank === 'Second') calculatedScore = 5;
-        else if (score.rank === 'Third') calculatedScore = 2;
+        else if (score.rank === 'Third') calculatedScore = 3;
       } else if (score.category !== 'general(group)') {
         if (score.rank === 'First') calculatedScore = 5;
         else if (score.rank === 'Second') calculatedScore = 3;

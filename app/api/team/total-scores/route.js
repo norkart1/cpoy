@@ -140,7 +140,7 @@ export async function GET(req) {
                 },
                 {
                   case: { $and: [{ $eq: ['$category', 'general(individual)'] }, { $eq: ['$rank', 'Third'] }] },
-                  then: 2,
+                  then: 3,
                 },
                 {
                   case: { $and: [{ $eq: ['$category', 'general(group)'] }, { $eq: ['$rank', 'First'] }] },

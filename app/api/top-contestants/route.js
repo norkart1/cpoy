@@ -119,7 +119,7 @@ export async function GET(req) {
                         { $eq: ['$rank', 'Third'] },
                       ],
                     },
-                    then: 2,
+                    then: 3,
                   },
                   { case: { $eq: ['$rank', 'First'] }, then: 5 },
                   { case: { $eq: ['$rank', 'Second'] }, then: 3 },
