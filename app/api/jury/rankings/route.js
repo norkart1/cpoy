@@ -161,6 +161,7 @@ export async function GET(req) {
 
     return NextResponse.json({ success: true, rankings }, { status: 200 });
   } catch (error) {
+    
     console.error('Error fetching rankings:', error.name, error.message, error.stack);
     return NextResponse.json({ success: false, message: 'Server error fetching rankings', error: error.message }, { status: 500 });
   }

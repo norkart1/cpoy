@@ -8,11 +8,11 @@ export async function GET(req) {
     await dbConnect();
 
     const results = await Score.aggregate([
-      // Step 1: Filter ranked documents, exclude general(group)
+      // Step 1: Filter ranked documents, exclude general(individual) and general(group)
       {
         $match: {
           rank: { $in: ['First', 'Second', 'Third'] },
-          category: { $ne: 'general(group)' }, // Exclude general(group) scores
+          category: { $nin: ['general(individual)', 'general(group)'] }, // Exclude both categories
         },
       },
       // Debug: Log matched scores
@@ -94,33 +94,6 @@ export async function GET(req) {
             $sum: {
               $switch: {
                 branches: [
-                  {
-                    case: {
-                      $and: [
-                        { $eq: ['$category', 'general(individual)'] },
-                        { $eq: ['$rank', 'First'] },
-                      ],
-                    },
-                    then: 8,
-                  },
-                  {
-                    case: {
-                      $and: [
-                        { $eq: ['$category', 'general(individual)'] },
-                        { $eq: ['$rank', 'Second'] },
-                      ],
-                    },
-                    then: 5,
-                  },
-                  {
-                    case: {
-                      $and: [
-                        { $eq: ['$category', 'general(individual)'] },
-                        { $eq: ['$rank', 'Third'] },
-                      ],
-                    },
-                    then: 3,
-                  },
                   { case: { $eq: ['$rank', 'First'] }, then: 5 },
                   { case: { $eq: ['$rank', 'Second'] }, then: 3 },
                   { case: { $eq: ['$rank', 'Third'] }, then: 1 },
@@ -198,7 +171,7 @@ export async function GET(req) {
       !results[0].generalIndividual.length
     ) {
       const debugCounts = await Score.aggregate([
-        { $match: { rank: { $in: ['First', 'Second', 'Third'] }, category: { $ne: 'general(group)' } } },
+        { $match: { rank: { $in: ['First', 'Second', 'Third'] }, category: { $nin: ['general(individual)', 'general(group)'] } } },
         {
           $lookup: {
             from: 'items',
@@ -217,7 +190,7 @@ export async function GET(req) {
       return NextResponse.json(
         {
           success: false,
-          message: 'No ranked contestants found for published items',
+          message: 'No ranked contestants found for published items in subjunior, junior, or senior categories',
           subjunior: [],
           junior: [],
           senior: [],
