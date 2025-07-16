@@ -260,8 +260,6 @@
 //     </div>
 //   );
 // }
-
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -312,33 +310,6 @@ export default function JuryDashboard() {
             const contestantsData = contestantRes.data.contestants || [];
             setContestants(contestantsData);
             setItemName(contestantsData.length > 0 ? contestantsData[0].itemName || 'Unknown Competition' : 'No Item Assigned');
-
-            // Fetch existing scores and ranks
-            const scoreRes = await axios.get('/api/jury/scores', {
-              params: { juryId: parsed._id },
-            });
-            console.log('Scores API response:', scoreRes.data);
-            if (scoreRes.data.success) {
-              const scoresData = scoreRes.data.scores || [];
-              // Filter scores to only include valid contestants
-              const validContestantIds = contestantsData.map(c => c._id);
-              const initialScores = scoresData
-                .filter(s => validContestantIds.includes(s.contestant))
-                .reduce((acc, { contestant, score }) => ({
-                  ...acc,
-                  [contestant]: score.toString(),
-                }), {});
-              const initialRanks = scoresData
-                .filter(s => validContestantIds.includes(s.contestant))
-                .reduce((acc, { contestant, rank }) => ({
-                  ...acc,
-                  [contestant]: rank,
-                }), {});
-              setScores(initialScores);
-              setRanks(initialRanks);
-            } else {
-              setMessage({ type: 'error', text: scoreRes.data.message || 'Failed to load scores.' });
-            }
           } else {
             setMessage({ type: 'error', text: contestantRes.data.message || 'Failed to load contestants.' });
             setItemName('No Item Assigned');
@@ -397,6 +368,33 @@ export default function JuryDashboard() {
     setMessage(null);
   };
 
+  const calculateRanks = (scores) => {
+    const scoreEntries = Object.entries(scores)
+      .map(([contestantId, score]) => ({ contestantId, score: Number(score) }))
+      .sort((a, b) => b.score - a.score); // Sort in descending order
+
+    const newRanks = {};
+    if (scoreEntries.length > 0) newRanks[scoreEntries[0].contestantId] = 'First';
+    if (scoreEntries.length > 1) newRanks[scoreEntries[1].contestantId] = 'Second';
+    if (scoreEntries.length > 2) newRanks[scoreEntries[2].contestantId] = 'Third';
+
+    return newRanks;
+  };
+
+  const sortContestants = (contestants, ranks) => {
+    const rankOrder = { First: 1, Second: 2, Third: 3 };
+    return [...contestants].sort((a, b) => {
+      const rankA = ranks[a._id];
+      const rankB = ranks[b._id];
+      if (rankA && rankB) {
+        return rankOrder[rankA] - rankOrder[rankB];
+      }
+      if (rankA) return -1;
+      if (rankB) return 1;
+      return 0;
+    });
+  };
+
   const handleSubmitScores = async () => {
     if (Object.keys(scores).length === 0) {
       setMessage({ type: 'error', text: 'Please enter scores for at least one contestant.' });
@@ -426,42 +424,12 @@ export default function JuryDashboard() {
       console.log('Submit scores response:', res.data);
       if (res.data.success) {
         setMessage({ type: 'success', text: 'Scores submitted successfully!' });
-        // Fetch updated scores and ranks
-        try {
-          const scoreRes = await axios.get('/api/jury/scores', {
-            params: { juryId: jury._id },
-          });
-          console.log('Refreshed scores API response:', scoreRes.data);
-          if (scoreRes.data.success) {
-            const scoresData = scoreRes.data.scores || [];
-            const validContestantIds = contestants.map(c => c._id);
-            const updatedScores = scoresData
-              .filter(s => validContestantIds.includes(s.contestant))
-              .reduce((acc, { contestant, score }) => ({
-                ...acc,
-                [contestant]: score.toString(),
-              }), {});
-            const updatedRanks = scoresData
-              .filter(s => validContestantIds.includes(s.contestant))
-              .reduce((acc, { contestant, rank }) => ({
-                ...acc,
-                [contestant]: rank,
-              }), {});
-            setScores(updatedScores);
-            setRanks(updatedRanks);
-          } else {
-            setMessage({ type: 'error', text: scoreRes.data.message || 'Failed to refresh scores.' });
-          }
-        } catch (refreshErr) {
-          console.error('Error refreshing scores:', {
-            message: refreshErr.message,
-            response: refreshErr.response?.data,
-            status: refreshErr.response?.status,
-            code: refreshErr.code,
-            config: refreshErr.config,
-          });
-          setMessage({ type: 'error', text: refreshErr.response?.data?.message || 'Failed to refresh scores after submission.' });
-        }
+        // Calculate ranks locally
+        const updatedRanks = calculateRanks(scores);
+        setRanks(updatedRanks);
+        // Sort contestants to display ranked ones at the top
+        const sortedContestants = sortContestants(contestants, updatedRanks);
+        setContestants(sortedContestants);
       } else {
         const errorText = res.data.errors?.length > 0
           ? `Failed to submit scores: ${res.data.errors.join(', ')}`
@@ -560,13 +528,12 @@ export default function JuryDashboard() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                  
                       <div>
                         <div className="text-sm text-gray-500 font-geist-mono uppercase">code letter</div>
                         <div className="text-base font-semibold font-geist-sans text-black">{(contestant.codeLetter || 'N/A').toUpperCase()}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-500 font-geist-mono uppercase">chust numbre</div>
+                        <div className="text-sm text-gray-600 font-geist-mono uppercase">chest number</div>
                         <div className="text-base font-semibold font-geist-sans text-black">{(contestant.contestantNumber || 'N/A').toUpperCase()}</div>
                       </div>
                       {ranks[contestant._id] && ['First', 'Second', 'Third'].includes(ranks[contestant._id]) && (
@@ -602,7 +569,6 @@ export default function JuryDashboard() {
     </div>
   );
 }
-
 // 'use client';
 
 // import { useEffect, useState } from 'react';
