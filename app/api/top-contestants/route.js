@@ -38,7 +38,7 @@ export async function GET(req) {
       // Unwind the itemDetails array
       { $unwind: '$itemDetails' },
       // Filter for published items
-      { $match: { 'itemDetails.published': true } },
+      // { $match: { 'itemDetails.published': true } },
       // Step 3: Join with Contestant
       {
         $lookup: {
